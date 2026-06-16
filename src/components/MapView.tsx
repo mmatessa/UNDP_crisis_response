@@ -46,6 +46,10 @@ export default function MapView({ submissions, onSelectSubmission }: MapViewProp
         </div>
       `;
 
+      const infraLabel = submission.infrastructure_type.startsWith('other:')
+        ? submission.infrastructure_type.replace('other: ', '')
+        : t(`submit.infrastructureTypes.${submission.infrastructure_type}`, submission.infrastructure_type.replace(/_/g, ' '));
+
       const marker = L.marker([lat, lng], {
         icon: L.divIcon({
           html,
@@ -56,7 +60,7 @@ export default function MapView({ submissions, onSelectSubmission }: MapViewProp
       })
         .bindPopup(
           `<div class="max-w-xs">
-            <div class="font-semibold mb-2 text-sm">${t(`submit.types.${submission.infrastructure_type}`, submission.infrastructure_type).toUpperCase()}</div>
+            <div class="font-semibold mb-2 text-sm">${infraLabel.toUpperCase()}</div>
             <div class="text-xs mb-2">${t(`submit.damageLevels.${submission.damage_level}`).toUpperCase()} ${t('map.damage')}</div>
             <div class="text-xs text-gray-600 mb-3">${submission.description.substring(0, 100)}${submission.description.length > 100 ? '...' : ''}</div>
             <button class="w-full bg-blue-600 text-white py-1 px-2 rounded text-xs hover:bg-blue-700">${t('detail.title')}</button>

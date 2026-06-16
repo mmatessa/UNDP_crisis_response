@@ -1,4 +1,4 @@
-import { X, MapPin, Calendar, User } from 'lucide-react';
+import { X, MapPin, Calendar, User, Building, AlertTriangle, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { CrisisSubmission } from '../types/database';
 
@@ -33,6 +33,13 @@ export default function SubmissionDetail({ submission, onClose }: SubmissionDeta
     });
   };
 
+  const getInfrastructureTypeLabel = (type: string) => {
+    if (type.startsWith('other:')) {
+      return type.replace('other: ', '');
+    }
+    return t(`submit.infrastructureTypes.${type}`, type.replace(/_/g, ' '));
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[9999]">
       <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
@@ -53,13 +60,55 @@ export default function SubmissionDetail({ submission, onClose }: SubmissionDeta
             className="w-full h-64 object-cover rounded-lg"
           />
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <span className={`px-4 py-2 rounded-full border-2 font-semibold text-sm ${getDamageBadgeClass(submission.damage_level)}`}>
               {t(`submit.damageLevels.${submission.damage_level}`).toUpperCase()} {t('map.damage')}
             </span>
             <span className="px-4 py-2 bg-blue-100 text-blue-800 rounded-full border-2 border-blue-300 font-semibold text-sm">
-              {t(`submit.types.${submission.infrastructure_type}`, submission.infrastructure_type).toUpperCase()}
+              {getInfrastructureTypeLabel(submission.infrastructure_type).toUpperCase()}
             </span>
+          </div>
+
+          {/* Infrastructure Name */}
+          {submission.infrastructure_name && (
+            <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+              <Building className="text-blue-600 flex-shrink-0 mt-1" size={20} />
+              <div>
+                <div className="font-semibold text-gray-900 mb-1">{t('detail.infrastructureName')}</div>
+                <div className="text-sm text-gray-600">{submission.infrastructure_name}</div>
+              </div>
+            </div>
+          )}
+
+          {/* Crisis Nature */}
+          {submission.crisis_nature && submission.crisis_nature.length > 0 && (
+            <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+              <AlertTriangle className="text-blue-600 flex-shrink-0 mt-1" size={20} />
+              <div>
+                <div className="font-semibold text-gray-900 mb-2">{t('detail.crisisNature')}</div>
+                <div className="flex flex-wrap gap-2">
+                  {submission.crisis_nature.map((nature) => (
+                    <span
+                      key={nature}
+                      className="px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-sm"
+                    >
+                      {t(`submit.crisisNatureOptions.${nature}`, nature.replace(/_/g, ' '))}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Debris Clearance */}
+          <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+            <Trash2 className="text-blue-600 flex-shrink-0 mt-1" size={20} />
+            <div>
+              <div className="font-semibold text-gray-900 mb-1">{t('detail.debrisClearance')}</div>
+              <div className="text-sm text-gray-600">
+                {submission.debris_clearance_required ? t('submit.yes') : t('submit.no')}
+              </div>
+            </div>
           </div>
 
           <div>
