@@ -78,13 +78,42 @@
     "locationRequired": "يرجى تفعيل خدمات الموقع أو إدخال الإحداثيات يدوياً",
     "geolocationNotSupported": "المتصفح لا يدعم تحديد الموقع الجغرافي",
     "locationError": "تعذر الحصول على الموقع. يرجى تفعيل خدمات الموقع أو الإدخال يدوياً.",
-    "submitError": "خطأ في إرسال التقرير. يرجى المحاولة مرة أخرى."
+    "submitError": "خطأ في إرسال التقرير. يرجى المحاولة مرة أخرى.",
+    "buildingLocationLabel": "اختر المبنى / الموقع",
+    "buildingLocationHelp": "انقر على بصمة المبنى أو في أي مكان على الخريطة لاختيار الموقع. قم بالتكبير إلى مستوى 15+ لرؤية بصمات المباني.",
+    "clickToSelectBuilding": "انقر لاختيار هذا المبنى",
+    "selectedBuilding": "المبنى المختار",
+    "selectedBuildingLabel": "المبنى المختار",
+    "customLocation": "موقع مخصص",
+    "loadingBuildings": "جاري تحميل المباني...",
+    "useGPS": "استخدم موقعي GPS",
+    "clearBuilding": "مسح الاختيار",
+    "currentCoordinates": "الإحداثيات الحالية",
+    "osmId": "معرف OSM",
+    "zoomNotice": "قم بالتكبير إلى مستوى 15+ لرؤية بصمات المباني",
+    "buildingError": {
+      "zoom_too_low": "قم بالتكبير لرؤية بصمات المباني",
+      "rate_limited": "طلبات كثيرة. يرجى الانتظار والمحاولة مرة أخرى.",
+      "network_error": "تعذر تحميل المباني. تحقق من اتصالك.",
+      "timeout": "انتهت مهلة الطلب. يرجى المحاولة مرة أخرى."
+    }
   },
   "map": {
     "legendTitle": "مفتاح الضرر",
     "reports": "تقرير",
     "reports_plural": "تقارير",
-    "damage": "ضرر"
+    "damage": "ضرر",
+    "clickToSelectBuilding": "انقر لاختيار هذا المبنى",
+    "selectedBuilding": "المبنى المختار",
+    "buildingFootprint": "مبنى",
+    "zoomNotice": "قم بالتكبير إلى مستوى 15+ لرؤية بصمات المباني",
+    "loadingBuildings": "جاري تحميل المباني...",
+    "errors": {
+      "zoom_too_low": "قم بالتكبير لرؤية بصمات المباني",
+      "rate_limited": "طلبات كثيرة. يرجى الانتظار والمحاولة مرة أخرى.",
+      "network_error": "تعذر تحميل المباني. تحقق من اتصالك.",
+      "timeout": "انتهت مهلة الطلب. يرجى المحاولة مرة أخرى."
+    }
   },
   "detail": {
     "title": "تفاصيل التقرير",

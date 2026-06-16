@@ -78,13 +78,42 @@
     "locationRequired": "请启用定位服务或手动输入坐标",
     "geolocationNotSupported": "您的浏览器不支持地理定位",
     "locationError": "无法获取位置。请启用定位服务或手动输入。",
-    "submitError": "提交报告时出错。请重试。"
+    "submitError": "提交报告时出错。请重试。",
+    "buildingLocationLabel": "选择建筑/位置",
+    "buildingLocationHelp": "点击建筑轮廓或地图上的任意位置来选择位置。放大到15级以上可查看建筑轮廓。",
+    "clickToSelectBuilding": "点击选择此建筑",
+    "selectedBuilding": "已选建筑",
+    "selectedBuildingLabel": "已选择建筑",
+    "customLocation": "自定义位置",
+    "loadingBuildings": "正在加载建筑...",
+    "useGPS": "使用我的GPS位置",
+    "clearBuilding": "清除选择",
+    "currentCoordinates": "当前坐标",
+    "osmId": "OSM ID",
+    "zoomNotice": "放大到15级以上可查看建筑轮廓",
+    "buildingError": {
+      "zoom_too_low": "放大查看建筑轮廓",
+      "rate_limited": "请求过多，请稍后再试。",
+      "network_error": "无法加载建筑，请检查网络连接。",
+      "timeout": "请求超时，请重试。"
+    }
   },
   "map": {
     "legendTitle": "损害图例",
     "reports": "份报告",
     "reports_plural": "份报告",
-    "damage": "损害"
+    "damage": "损害",
+    "clickToSelectBuilding": "点击选择此建筑",
+    "selectedBuilding": "已选建筑",
+    "buildingFootprint": "建筑",
+    "zoomNotice": "放大到15级以上可查看建筑轮廓",
+    "loadingBuildings": "正在加载建筑...",
+    "errors": {
+      "zoom_too_low": "放大查看建筑轮廓",
+      "rate_limited": "请求过多，请稍后再试。",
+      "network_error": "无法加载建筑，请检查网络连接。",
+      "timeout": "请求超时，请重试。"
+    }
   },
   "detail": {
     "title": "报告详情",

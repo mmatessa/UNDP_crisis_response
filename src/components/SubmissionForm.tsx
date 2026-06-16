@@ -1,11 +1,280 @@
-import { useState, useEffect } from 'react';
-import { Camera, MapPin, Loader2, X } from 'lucide-react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { Camera, MapPin, Loader2, X, Building } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import { supabase } from '../lib/supabase';
 import type { DamageLevel, CrisisNature, InfrastructureType } from '../types/database';
+import type { BuildingFootprint } from '../services/buildingFootprints';
+import { fetchBuildingFootprints, MIN_ZOOM } from '../services/buildingFootprints';
 
 interface SubmissionFormProps {
   onSubmitSuccess: () => void;
+}
+
+function BuildingSelectionMap({
+  selectedBuilding,
+  onSelectBuilding,
+  coordinates,
+}: {
+  selectedBuilding: BuildingFootprint | null;
+  onSelectBuilding: (building: BuildingFootprint | null) => void;
+  coordinates: { lat: number; lng: number } | null;
+}) {
+  const { t } = useTranslation();
+  const mapContainer = useRef<HTMLDivElement>(null);
+  const map = useRef<L.Map | null>(null);
+  const buildingsLayerRef = useRef<L.LayerGroup | null>(null);
+  const selectedPolygonRef = useRef<L.Polygon | null>(null);
+  const currentMarkerRef = useRef<L.Marker | null>(null);
+  const [zoom, setZoom] = useState(15);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const loadedBuildingsRef = useRef<BuildingFootprint[]>([]);
+  const lastFetchBboxRef = useRef<string>('');
+
+  const initialCenter: [number, number] = coordinates
+    ? [coordinates.lat, coordinates.lng]
+    : [20, 0];
+
+  useEffect(() => {
+    if (!mapContainer.current || map.current) return;
+
+    map.current = L.map(mapContainer.current, {
+      center: initialCenter,
+      zoom: coordinates ? 17 : 15,
+      scrollWheelZoom: true,
+    });
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors',
+      maxZoom: 19,
+    }).addTo(map.current);
+
+    buildingsLayerRef.current = L.layerGroup().addTo(map.current);
+
+    map.current.on('zoomend', () => {
+      if (map.current) {
+        setZoom(map.current.getZoom());
+      }
+    });
+
+    map.current.on('click', (e) => {
+      const { lat, lng } = e.latlng;
+      onSelectBuilding({
+        id: -Date.now(),
+        osmId: 'custom',
+        type: 'way',
+        geometry: [[lat, lng]],
+        tags: {},
+        center: [lat, lng],
+      });
+    });
+
+    return () => {
+      if (map.current) {
+        map.current.remove();
+        map.current = null;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (map.current && coordinates) {
+      map.current.setView([coordinates.lat, coordinates.lng], 17);
+    }
+  }, [coordinates]);
+
+  useEffect(() => {
+    if (!map.current || !buildingsLayerRef.current) return;
+
+    if (currentMarkerRef.current) {
+      currentMarkerRef.current.remove();
+    }
+
+    if (coordinates && !selectedBuilding) {
+      const marker = L.marker([coordinates.lat, coordinates.lng], {
+        icon: L.divIcon({
+          html: '<div class="w-6 h-6 bg-blue-600 rounded-full border-2 border-white shadow-lg"></div>',
+          className: 'gps-marker',
+          iconSize: [24, 24],
+          iconAnchor: [12, 12],
+        }),
+      });
+      marker.addTo(map.current);
+      currentMarkerRef.current = marker;
+    }
+  }, [coordinates, selectedBuilding]);
+
+  const fetchBuildings = useCallback(async () => {
+    if (!map.current || isLoading || zoom < MIN_ZOOM) return;
+
+    const bounds = map.current.getBounds();
+    const bboxKey = `${bounds.getSouth().toFixed(3)},${bounds.getWest().toFixed(3)},${bounds.getNorth().toFixed(3)},${bounds.getEast().toFixed(3)}`;
+
+    if (bboxKey === lastFetchBboxRef.current) return;
+
+    setIsLoading(true);
+    setError(null);
+    lastFetchBboxRef.current = bboxKey;
+
+    const result = await fetchBuildingFootprints(bounds, zoom);
+
+    setIsLoading(false);
+
+    if (result.error) {
+      setError(result.error);
+    } else if (buildingsLayerRef.current) {
+      buildingsLayerRef.current.clearLayers();
+
+      result.buildings.forEach((building) => {
+        if (selectedBuilding?.id === building.id) return;
+
+        const polygon = L.polygon(building.geometry, {
+          color: '#6b7280',
+          weight: 1,
+          fillColor: '#d1d5db',
+          fillOpacity: 0.4,
+        });
+
+        polygon.bindTooltip(t('submit.clickToSelectBuilding'), {
+          permanent: false,
+          direction: 'top',
+          offset: [0, -5],
+        });
+
+        polygon.on('click', (e) => {
+          L.DomEvent.stopPropagation(e);
+          onSelectBuilding(building);
+        });
+
+        polygon.on('mouseover', function () {
+          this.setStyle({
+            fillColor: '#93c5fd',
+            fillOpacity: 0.6,
+          });
+        });
+
+        polygon.on('mouseout', function () {
+          this.setStyle({
+            fillColor: '#d1d5db',
+            fillOpacity: 0.4,
+          });
+        });
+
+        polygon.addTo(buildingsLayerRef.current!);
+      });
+
+      loadedBuildingsRef.current = result.buildings;
+    }
+  }, [zoom, isLoading, selectedBuilding, onSelectBuilding, t]);
+
+  useEffect(() => {
+    if (map.current) {
+      fetchBuildings();
+    }
+  }, [map.current, zoom, fetchBuildings]);
+
+  useEffect(() => {
+    if (!map.current) return;
+
+    const onMoveEnd = () => {
+      if (map.current && map.current.getZoom() >= MIN_ZOOM) {
+        fetchBuildings();
+      }
+    };
+
+    map.current.on('moveend', onMoveEnd);
+
+    return () => {
+      map.current?.off('moveend', onMoveEnd);
+    };
+  }, [fetchBuildings]);
+
+  useEffect(() => {
+    if (selectedPolygonRef.current) {
+      selectedPolygonRef.current.remove();
+      selectedPolygonRef.current = null;
+    }
+
+    if (selectedBuilding && map.current) {
+      if (selectedBuilding.geometry.length > 2) {
+        const polygon = L.polygon(selectedBuilding.geometry, {
+          color: '#2563eb',
+          weight: 3,
+          fillColor: '#3b82f6',
+          fillOpacity: 0.6,
+        });
+
+        polygon.bindTooltip(t('submit.selectedBuilding'), {
+          permanent: false,
+          direction: 'top',
+          offset: [0, -5],
+        });
+
+        polygon.on('click', () => {
+          onSelectBuilding(null);
+        });
+
+        polygon.addTo(map.current);
+        selectedPolygonRef.current = polygon;
+
+        map.current.fitBounds(polygon.getBounds(), { padding: [50, 50] });
+      } else {
+        const marker = L.marker(selectedBuilding.center, {
+          icon: L.divIcon({
+            html: '<div class="w-6 h-6 bg-blue-600 rounded-full border-2 border-white shadow-lg flex items-center justify-center"><svg width="12" height="12" viewBox="0 0 24 24" fill="white"><circle cx="12" cy="12" r="6"/></svg></div>',
+            className: 'selected-point-marker',
+            iconSize: [24, 24],
+            iconAnchor: [12, 12],
+          }),
+        });
+
+        marker.addTo(map.current);
+        selectedPolygonRef.current = marker as unknown as L.Polygon;
+      }
+    }
+  }, [selectedBuilding, t, onSelectBuilding]);
+
+  const zoomNotice = zoom < MIN_ZOOM ? t('submit.zoomNotice', { minZoom: MIN_ZOOM }) : null;
+
+  return (
+    <div className="relative w-full h-64 rounded-lg overflow-hidden border border-gray-300 bg-gray-100">
+      <div ref={mapContainer} className="w-full h-full" />
+
+      {zoomNotice && (
+        <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 bg-yellow-100 border border-yellow-300 rounded px-3 py-1 z-[1000] shadow">
+          <p className="text-xs text-yellow-800">{zoomNotice}</p>
+        </div>
+      )}
+
+      {isLoading && (
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded px-3 py-1 z-[1000] shadow flex items-center gap-2">
+          <Loader2 size={14} className="animate-spin text-blue-600" />
+          <span className="text-xs">{t('submit.loadingBuildings')}</span>
+        </div>
+      )}
+
+      {error && (
+        <div className="absolute top-2 left-1/2 transform -translate-x-1/2 bg-red-100 border border-red-300 rounded px-3 py-1 z-[1000] shadow">
+          <p className="text-xs text-red-800">{t(`submit.buildingError.${error}`)}</p>
+        </div>
+      )}
+
+      {selectedBuilding && (
+        <div className="absolute top-2 left-2 bg-blue-50 border border-blue-300 rounded px-3 py-2 z-[1000] shadow max-w-[200px]">
+          <p className="text-xs font-semibold text-blue-900">{t('submit.selectedBuildingLabel')}</p>
+          <p className="text-xs text-blue-800 truncate">
+            {selectedBuilding.tags.name ||
+              selectedBuilding.tags['addr:housenumber'] ||
+              (selectedBuilding.osmId === 'custom'
+                ? t('submit.customLocation')
+                : `OSM: ${selectedBuilding.osmId}`)}
+          </p>
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function SubmissionForm({ onSubmitSuccess }: SubmissionFormProps) {
@@ -24,6 +293,7 @@ export default function SubmissionForm({ onSubmitSuccess }: SubmissionFormProps)
   const [submittedBy, setSubmittedBy] = useState('');
   const [coordinates, setCoordinates] = useState<{ lat: number; lng: number } | null>(null);
   const [gettingLocation, setGettingLocation] = useState(false);
+  const [selectedBuilding, setSelectedBuilding] = useState<BuildingFootprint | null>(null);
 
   const infrastructureTypes: InfrastructureType[] = [
     'residential_infrastructure',
@@ -76,6 +346,28 @@ export default function SubmissionForm({ onSubmitSuccess }: SubmissionFormProps)
 
   useEffect(() => {
     getCurrentLocation();
+  }, []);
+
+  const handleBuildingSelect = useCallback((building: BuildingFootprint | null) => {
+    setSelectedBuilding(building);
+    if (building && building.center) {
+      setCoordinates({
+        lat: building.center[0],
+        lng: building.center[1],
+      });
+      if (building.tags.name) {
+        setLocationName(building.tags.name);
+      } else if (building.tags['addr:street']) {
+        const addr = [
+          building.tags['addr:housenumber'],
+          building.tags['addr:street'],
+          building.tags['addr:city'],
+        ]
+          .filter(Boolean)
+          .join(', ');
+        if (addr) setLocationName(addr);
+      }
+    }
   }, []);
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -158,7 +450,8 @@ export default function SubmissionForm({ onSubmitSuccess }: SubmissionFormProps)
         photo_url: photoUrl,
         description,
         damage_level: damageLevel,
-        infrastructure_type: infrastructureType === 'other' ? `other: ${otherInfrastructureType}` : infrastructureType,
+        infrastructure_type:
+          infrastructureType === 'other' ? `other: ${otherInfrastructureType}` : infrastructureType,
         infrastructure_name: infrastructureName || null,
         crisis_nature: crisisNature,
         debris_clearance_required: debrisClearanceRequired,
@@ -183,6 +476,7 @@ export default function SubmissionForm({ onSubmitSuccess }: SubmissionFormProps)
       setDebrisClearanceRequired(null);
       setLocationName('');
       setSubmittedBy('');
+      setSelectedBuilding(null);
 
       onSubmitSuccess();
     } catch (error) {
@@ -216,12 +510,82 @@ export default function SubmissionForm({ onSubmitSuccess }: SubmissionFormProps)
           </label>
         </div>
         {photoPreview && (
-          <img
-            src={photoPreview}
-            alt="Preview"
-            className="mt-4 max-w-full h-48 object-cover rounded-lg"
-          />
+          <img src={photoPreview} alt="Preview" className="mt-4 max-w-full h-48 object-cover rounded-lg" />
         )}
+      </div>
+
+      {/* Building / Location Selection */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          {t('submit.buildingLocationLabel')} <span className="text-red-500">*</span>
+        </label>
+        <p className="text-xs text-gray-500 mb-3">{t('submit.buildingLocationHelp')}</p>
+        <BuildingSelectionMap
+          selectedBuilding={selectedBuilding}
+          onSelectBuilding={handleBuildingSelect}
+          coordinates={coordinates}
+        />
+
+        {/* GPS Fallback */}
+        <div className="mt-3 flex items-center gap-2">
+          <button
+            type="button"
+            onClick={getCurrentLocation}
+            disabled={gettingLocation}
+            className="flex items-center gap-2 px-3 py-1.5 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition disabled:opacity-50"
+          >
+            {gettingLocation ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : (
+              <MapPin size={16} />
+            )}
+            <span>{gettingLocation ? t('submit.gettingLocation') : t('submit.useGPS')}</span>
+          </button>
+
+          {selectedBuilding && (
+            <button
+              type="button"
+              onClick={() => {
+                setSelectedBuilding(null);
+                if (coordinates) {
+                  getCurrentLocation();
+                }
+              }}
+              className="flex items-center gap-1 px-3 py-1.5 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200 transition"
+            >
+              <X size={14} />
+              <span>{t('submit.clearBuilding')}</span>
+            </button>
+          )}
+        </div>
+
+        {/* Coordinates display */}
+        {coordinates && (
+          <div className="mt-3 text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
+            <div className="flex items-center gap-2 mb-1">
+              <Building size={14} className="text-blue-600" />
+              <span className="font-medium">{t('submit.currentCoordinates')}</span>
+            </div>
+            <p>
+              {t('submit.latitude')}: {coordinates.lat.toFixed(6)}, {t('submit.longitude')}:{' '}
+              {coordinates.lng.toFixed(6)}
+            </p>
+            {selectedBuilding && (
+              <p className="text-xs text-blue-600 mt-1">
+                {t('submit.osmId')}: {selectedBuilding.osmId}
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* Location name input */}
+        <input
+          type="text"
+          value={locationName}
+          onChange={(e) => setLocationName(e.target.value)}
+          className="mt-3 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          placeholder={t('submit.locationName')}
+        />
       </div>
 
       {/* Infrastructure Type */}
@@ -390,49 +754,6 @@ export default function SubmissionForm({ onSubmitSuccess }: SubmissionFormProps)
           placeholder={t('submit.descriptionPlaceholder')}
           required
         />
-      </div>
-
-      {/* Location */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {t('submit.location')}
-        </label>
-        <div className="space-y-3">
-          <button
-            type="button"
-            onClick={getCurrentLocation}
-            disabled={gettingLocation}
-            className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition disabled:opacity-50"
-          >
-            {gettingLocation ? (
-              <Loader2 size={20} className="animate-spin" />
-            ) : (
-              <MapPin size={20} />
-            )}
-            <span>
-              {gettingLocation
-                ? t('submit.gettingLocation')
-                : t('submit.updateLocation')}
-            </span>
-          </button>
-          {coordinates && (
-            <div className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
-              <p>
-                {t('submit.latitude')}: {coordinates.lat.toFixed(6)}
-              </p>
-              <p>
-                {t('submit.longitude')}: {coordinates.lng.toFixed(6)}
-              </p>
-            </div>
-          )}
-          <input
-            type="text"
-            value={locationName}
-            onChange={(e) => setLocationName(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder={t('submit.locationName')}
-          />
-        </div>
       </div>
 
       {/* Contact */}

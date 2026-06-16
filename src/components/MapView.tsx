@@ -1,30 +1,77 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import type { CrisisSubmission } from '../types/database';
+import type { BuildingFootprint } from '../services/buildingFootprints';
+import { useBuildingFootprintLayer, getZoomNotice } from './BuildingFootprintLayer';
+import { Loader2 } from 'lucide-react';
 
 interface MapViewProps {
   submissions: CrisisSubmission[];
   onSelectSubmission: (submission: CrisisSubmission) => void;
+  onBuildingSelect?: (building: BuildingFootprint | null) => void;
+  selectedBuilding?: BuildingFootprint | null;
+  enableBuildingSelection?: boolean;
+  initialCenter?: [number, number];
+  initialZoom?: number;
 }
 
-export default function MapView({ submissions, onSelectSubmission }: MapViewProps) {
+export default function MapView({
+  submissions,
+  onSelectSubmission,
+  onBuildingSelect,
+  selectedBuilding,
+  enableBuildingSelection = false,
+  initialCenter = [20, 0],
+  initialZoom = 2,
+}: MapViewProps) {
   const { t } = useTranslation();
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<L.Map | null>(null);
   const markers = useRef<L.Marker[]>([]);
+  const [zoom, setZoom] = useState(initialZoom);
+  const [isLoadingBuildings, setIsLoadingBuildings] = useState(false);
+  const [buildingError, setBuildingError] = useState<string | null>(null);
+
+  const handleBuildingSelect = useCallback(
+    (building: BuildingFootprint | null) => {
+      if (onBuildingSelect) {
+        onBuildingSelect(building);
+      }
+    },
+    [onBuildingSelect]
+  );
+
+  useBuildingFootprintLayer({
+    map: map.current,
+    selectedBuilding: selectedBuilding || null,
+    onSelectBuilding: handleBuildingSelect,
+    enabled: enableBuildingSelection,
+  });
 
   useEffect(() => {
     if (!mapContainer.current) return;
 
     if (!map.current) {
-      map.current = L.map(mapContainer.current).setView([20, 0], 2);
+      map.current = L.map(mapContainer.current).setView(initialCenter, initialZoom);
 
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors',
         maxZoom: 19,
       }).addTo(map.current);
+
+      map.current.on('zoomend', () => {
+        if (map.current) {
+          setZoom(map.current.getZoom());
+        }
+      });
+
+      map.current.on('moveend', () => {
+        if (map.current && enableBuildingSelection) {
+          setZoom(map.current.getZoom());
+        }
+      });
     }
 
     markers.current.forEach((marker) => marker.remove());
@@ -78,16 +125,41 @@ export default function MapView({ submissions, onSelectSubmission }: MapViewProp
       markers.current.push(marker);
     });
 
-    if (submissions.length > 0 && map.current) {
+    if (submissions.length > 0 && map.current && !enableBuildingSelection) {
       const group = new L.FeatureGroup(markers.current);
       map.current.fitBounds(group.getBounds().pad(0.1), { maxZoom: 12 });
     }
-  }, [submissions, onSelectSubmission, t]);
+  }, [submissions, onSelectSubmission, t, enableBuildingSelection, initialCenter, initialZoom]);
+
+  const zoomNotice = enableBuildingSelection ? getZoomNotice(zoom) : null;
 
   return (
     <div className="relative w-full h-full rounded-lg overflow-hidden bg-gray-200">
       <div ref={mapContainer} className="w-full h-full" />
 
+      {/* Building footprints zoom notice */}
+      {enableBuildingSelection && zoomNotice && (
+        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-yellow-100 border border-yellow-300 rounded-lg px-4 py-2 z-[400] shadow-md">
+          <p className="text-sm text-yellow-800">{t('map.zoomNotice')}</p>
+        </div>
+      )}
+
+      {/* Loading indicator */}
+      {isLoadingBuildings && (
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg px-4 py-2 z-[400] shadow-md flex items-center gap-2">
+          <Loader2 size={16} className="animate-spin text-blue-600" />
+          <span className="text-sm text-gray-700">{t('map.loadingBuildings')}</span>
+        </div>
+      )}
+
+      {/* Building fetch error */}
+      {buildingError && (
+        <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 bg-red-100 border border-red-300 rounded-lg px-4 py-2 z-[400] shadow-md">
+          <p className="text-sm text-red-800">{t(`map.errors.${buildingError}`)}</p>
+        </div>
+      )}
+
+      {/* Damage Level Legend */}
       <div className="absolute top-4 left-4 bg-white rounded-lg shadow-lg p-4 z-[400]">
         <h3 className="font-semibold text-gray-900 mb-2 text-sm">{t('map.legendTitle')}</h3>
         <div className="space-y-2 text-xs">
@@ -104,13 +176,32 @@ export default function MapView({ submissions, onSelectSubmission }: MapViewProp
             <span>{t('submit.damageLevels.destroyed')}</span>
           </div>
         </div>
+        {enableBuildingSelection && (
+          <div className="mt-3 pt-3 border-t border-gray-200">
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-3 bg-gray-300 border border-gray-500 rounded-sm"></div>
+              <span className="text-xs text-gray-600">{t('map.buildingFootprint')}</span>
+            </div>
+          </div>
+        )}
       </div>
 
+      {/* Reports count */}
       <div className="absolute top-4 right-4 bg-white rounded-lg shadow-lg p-4 z-[400]">
         <div className="text-sm font-semibold text-gray-900">
           {submissions.length} {submissions.length === 1 ? t('map.reports') : t('map.reports_plural')}
         </div>
       </div>
+
+      {/* Selected building info */}
+      {enableBuildingSelection && selectedBuilding && (
+        <div className="absolute bottom-4 left-4 bg-blue-50 border border-blue-300 rounded-lg p-3 z-[400] shadow-md max-w-xs">
+          <p className="text-xs font-semibold text-blue-900 mb-1">{t('map.selectedBuilding')}</p>
+          <p className="text-xs text-blue-800">
+            {selectedBuilding.tags.name || selectedBuilding.tags['addr:housenumber'] || `OSM ID: ${selectedBuilding.osmId}`}
+          </p>
+        </div>
+      )}
     </div>
   );
 }

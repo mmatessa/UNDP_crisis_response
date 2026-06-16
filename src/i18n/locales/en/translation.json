@@ -78,13 +78,42 @@
     "locationRequired": "Please enable location services or enter coordinates manually",
     "geolocationNotSupported": "Geolocation is not supported by your browser",
     "locationError": "Unable to get location. Please enable location services or enter manually.",
-    "submitError": "Error submitting report. Please try again."
+    "submitError": "Error submitting report. Please try again.",
+    "buildingLocationLabel": "Select Building / Location",
+    "buildingLocationHelp": "Click on a building footprint or click anywhere on the map to select a location. Zoom in to level 15+ to see building footprints.",
+    "clickToSelectBuilding": "Click to select this building",
+    "selectedBuilding": "Selected Building",
+    "selectedBuildingLabel": "Selected Building",
+    "customLocation": "Custom location",
+    "loadingBuildings": "Loading buildings...",
+    "useGPS": "Use my GPS location",
+    "clearBuilding": "Clear selection",
+    "currentCoordinates": "Current Coordinates",
+    "osmId": "OSM ID",
+    "zoomNotice": "Zoom in to level 15+ to see building footprints",
+    "buildingError": {
+      "zoom_too_low": "Zoom in to see building footprints",
+      "rate_limited": "Too many requests. Please wait and try again.",
+      "network_error": "Unable to load buildings. Check your connection.",
+      "timeout": "Request timed out. Please try again."
+    }
   },
   "map": {
     "legendTitle": "Damage Legend",
     "reports": "Report",
     "reports_plural": "Reports",
-    "damage": "DAMAGE"
+    "damage": "DAMAGE",
+    "clickToSelectBuilding": "Click to select this building",
+    "selectedBuilding": "Selected Building",
+    "buildingFootprint": "Building",
+    "zoomNotice": "Zoom in to level 15+ to see building footprints",
+    "loadingBuildings": "Loading buildings...",
+    "errors": {
+      "zoom_too_low": "Zoom in to see building footprints",
+      "rate_limited": "Too many requests. Please wait and try again.",
+      "network_error": "Unable to load buildings. Check your connection.",
+      "timeout": "Request timed out. Please try again."
+    }
   },
   "detail": {
     "title": "Submission Details",

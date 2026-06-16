@@ -78,13 +78,42 @@
     "locationRequired": "Por favor habilita los servicios de ubicación o ingresa las coordenadas manualmente",
     "geolocationNotSupported": "La geolocalización no es compatible con tu navegador",
     "locationError": "No se puede obtener la ubicación. Por favor habilita los servicios de ubicación o ingrésala manualmente.",
-    "submitError": "Error al enviar el informe. Por favor intenta de nuevo."
+    "submitError": "Error al enviar el informe. Por favor intenta de nuevo.",
+    "buildingLocationLabel": "Seleccionar Edificio/Ubicación",
+    "buildingLocationHelp": "Haz clic en un contorno de edificio o en cualquier lugar del mapa para seleccionar una ubicación. Amplía al nivel 15+ para ver los contornos de edificios.",
+    "clickToSelectBuilding": "Haz clic para seleccionar este edificio",
+    "selectedBuilding": "Edificio Seleccionado",
+    "selectedBuildingLabel": "Edificio Seleccionado",
+    "customLocation": "Ubicación personalizada",
+    "loadingBuildings": "Cargando edificios...",
+    "useGPS": "Usar mi ubicación GPS",
+    "clearBuilding": "Borrar selección",
+    "currentCoordinates": "Coordenadas Actuales",
+    "osmId": "ID OSM",
+    "zoomNotice": "Amplía al nivel 15+ para ver los contornos de edificios",
+    "buildingError": {
+      "zoom_too_low": "Amplía para ver los contornos de edificios",
+      "rate_limited": "Demasiadas solicitudes. Espera e intenta de nuevo.",
+      "network_error": "No se pueden cargar los edificios. Verifica tu conexión.",
+      "timeout": "Tiempo de espera agotado. Intenta de nuevo."
+    }
   },
   "map": {
     "legendTitle": "Leyenda de Daños",
     "reports": "informe",
     "reports_plural": "informes",
-    "damage": "DAÑO"
+    "damage": "DAÑO",
+    "clickToSelectBuilding": "Haz clic para seleccionar este edificio",
+    "selectedBuilding": "Edificio Seleccionado",
+    "buildingFootprint": "Edificio",
+    "zoomNotice": "Amplía al nivel 15+ para ver los contornos de edificios",
+    "loadingBuildings": "Cargando edificios...",
+    "errors": {
+      "zoom_too_low": "Amplía para ver los contornos de edificios",
+      "rate_limited": "Demasiadas solicitudes. Espera e intenta de nuevo.",
+      "network_error": "No se pueden cargar los edificios. Verifica tu conexión.",
+      "timeout": "Tiempo de espera agotado. Intenta de nuevo."
+    }
   },
   "detail": {
     "title": "Detalles del Informe",

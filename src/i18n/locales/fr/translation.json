@@ -78,13 +78,42 @@
     "locationRequired": "Veuillez activer les services de localisation ou entrer les coordonnées manuellement",
     "geolocationNotSupported": "La géolocalisation n'est pas prise en charge par votre navigateur",
     "locationError": "Impossible d'obtenir la localisation. Veuillez activer les services de localisation ou saisir manuellement.",
-    "submitError": "Erreur lors de la soumission du rapport. Veuillez réessayer."
+    "submitError": "Erreur lors de la soumission du rapport. Veuillez réessayer.",
+    "buildingLocationLabel": "Sélectionner le Bâtiment/Localisation",
+    "buildingLocationHelp": "Cliquez sur un bâtiment ou n'importe où sur la carte pour sélectionner un emplacement. Zoomez au niveau 15+ pour voir les empreintes des bâtiments.",
+    "clickToSelectBuilding": "Cliquez pour sélectionner ce bâtiment",
+    "selectedBuilding": "Bâtiment Sélectionné",
+    "selectedBuildingLabel": "Bâtiment Sélectionné",
+    "customLocation": "Localisation personnalisée",
+    "loadingBuildings": "Chargement des bâtiments...",
+    "useGPS": "Utiliser ma position GPS",
+    "clearBuilding": "Effacer la sélection",
+    "currentCoordinates": "Coordonnées Actuelles",
+    "osmId": "ID OSM",
+    "zoomNotice": "Zoomez au niveau 15+ pour voir les empreintes des bâtiments",
+    "buildingError": {
+      "zoom_too_low": "Zoomez pour voir les empreintes des bâtiments",
+      "rate_limited": "Trop de requêtes. Veuillez patienter et réessayer.",
+      "network_error": "Impossible de charger les bâtiments. Vérifiez votre connexion.",
+      "timeout": "Délai d'attente dépassé. Veuillez réessayer."
+    }
   },
   "map": {
     "legendTitle": "Légende des Dommages",
     "reports": "Rapport",
     "reports_plural": "Rapports",
-    "damage": "DOMMAGES"
+    "damage": "DOMMAGES",
+    "clickToSelectBuilding": "Cliquez pour sélectionner ce bâtiment",
+    "selectedBuilding": "Bâtiment Sélectionné",
+    "buildingFootprint": "Bâtiment",
+    "zoomNotice": "Zoomez au niveau 15+ pour voir les empreintes des bâtiments",
+    "loadingBuildings": "Chargement des bâtiments...",
+    "errors": {
+      "zoom_too_low": "Zoomez pour voir les empreintes des bâtiments",
+      "rate_limited": "Trop de requêtes. Veuillez patienter et réessayer.",
+      "network_error": "Impossible de charger les bâtiments. Vérifiez votre connexion.",
+      "timeout": "Délai d'attente dépassé. Veuillez réessayer."
+    }
   },
   "detail": {
     "title": "Détails de la Soumission",
