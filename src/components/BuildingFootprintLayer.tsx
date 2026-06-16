@@ -8,6 +8,7 @@ interface BuildingFootprintLayerProps {
   selectedBuilding: BuildingFootprint | null;
   onSelectBuilding: (building: BuildingFootprint | null) => void;
   enabled?: boolean;
+  onError?: (error: string) => void;
 }
 
 export function useBuildingFootprintLayer({
@@ -15,6 +16,7 @@ export function useBuildingFootprintLayer({
   selectedBuilding,
   onSelectBuilding,
   enabled = true,
+  onError,
 }: BuildingFootprintLayerProps) {
   const { t } = useTranslation();
   const buildingsLayerRef = useRef<L.LayerGroup | null>(null);
@@ -143,8 +145,13 @@ export function useBuildingFootprintLayer({
     loadingRef.current = false;
     pendingRequestRef.current = false;
 
+    if (result.error && result.error !== 'zoom_too_low') {
+      if (onError) onError(result.error);
+      return;
+    }
+
     renderBuildings(result.buildings);
-  }, [map, enabled, clearBuildings, renderBuildings]);
+  }, [map, enabled, clearBuildings, renderBuildings, onError]);
 
   useEffect(() => {
     if (!map) return;

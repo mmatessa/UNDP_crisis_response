@@ -110,6 +110,9 @@ export async function fetchBuildingFootprints(
   try {
     const response = await fetch('https://overpass-api.de/api/interpreter', {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
       body: `data=${encodeURIComponent(query)}`,
     });
 

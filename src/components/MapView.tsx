@@ -48,6 +48,7 @@ export default function MapView({
     selectedBuilding: selectedBuilding || null,
     onSelectBuilding: handleBuildingSelect,
     enabled: enableBuildingSelection,
+    onError: setBuildingError,
   });
 
   useEffect(() => {
