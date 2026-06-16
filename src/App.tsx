@@ -1,19 +1,31 @@
 import { useState, useEffect } from 'react';
 import { AlertCircle, Map, Upload, Download, Shield } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import './i18n';
+
+const rtlLanguages = ['ar'];
 import { supabase } from './lib/supabase';
 import type { CrisisSubmission } from './types/database';
 import SubmissionForm from './components/SubmissionForm';
 import MapView from './components/MapView';
 import SubmissionDetail from './components/SubmissionDetail';
 import ExportPanel from './components/ExportPanel';
+import LanguageSelector from './components/LanguageSelector';
 
 type Tab = 'submit' | 'map' | 'export';
 
 function App() {
+  const { t, i18n } = useTranslation();
   const [activeTab, setActiveTab] = useState<Tab>('submit');
   const [submissions, setSubmissions] = useState<CrisisSubmission[]>([]);
   const [selectedSubmission, setSelectedSubmission] = useState<CrisisSubmission | null>(null);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const isRtl = rtlLanguages.includes(i18n.language);
+    document.documentElement.dir = isRtl ? 'rtl' : 'ltr';
+    document.documentElement.lang = i18n.language;
+  }, [i18n.language]);
 
   const loadSubmissions = async () => {
     try {
@@ -55,27 +67,30 @@ function App() {
   }, []);
 
   const tabs = [
-    { id: 'submit' as Tab, label: 'Submit Report', icon: Upload },
-    { id: 'map' as Tab, label: 'View Map', icon: Map },
-    { id: 'export' as Tab, label: 'Export Data', icon: Download },
+    { id: 'submit' as Tab, label: t('nav.submit'), icon: Upload },
+    { id: 'map' as Tab, label: t('nav.map'), icon: Map },
+    { id: 'export' as Tab, label: t('nav.export'), icon: Download },
   ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50">
       <header className="bg-white border-b border-gray-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center gap-4">
-            <div className="bg-blue-600 p-3 rounded-lg">
-              <Shield className="text-white" size={32} />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="bg-blue-600 p-3 rounded-lg">
+                <Shield className="text-white" size={32} />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900">
+                  {t('app.title')}
+                </h1>
+                <p className="text-gray-600 mt-1">
+                  {t('app.subtitle')}
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                UNDP Crisis Response Platform
-              </h1>
-              <p className="text-gray-600 mt-1">
-                Community-powered damage assessment and rapid response
-              </p>
-            </div>
+            <LanguageSelector />
           </div>
         </div>
       </header>
@@ -106,7 +121,7 @@ function App() {
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-              <p className="text-gray-600">Loading submissions...</p>
+              <p className="text-gray-600">{t('loading')}</p>
             </div>
           </div>
         ) : (
@@ -116,10 +131,9 @@ function App() {
                 <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4 flex gap-3">
                   <AlertCircle className="text-blue-600 flex-shrink-0 mt-1" size={20} />
                   <div className="text-sm text-blue-900">
-                    <p className="font-semibold mb-1">Help us respond faster</p>
+                    <p className="font-semibold mb-1">{t('submit.helpTitle')}</p>
                     <p>
-                      Share photos and information about damaged infrastructure to help
-                      emergency responders prioritize aid and recovery efforts.
+                      {t('submit.helpText')}
                     </p>
                   </div>
                 </div>
@@ -156,10 +170,10 @@ function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="text-center text-gray-600 text-sm">
             <p className="mb-2">
-              Powered by the United Nations Development Programme (UNDP)
+              {t('app.poweredBy')}
             </p>
             <p className="text-gray-500">
-              Open-source platform for community-powered crisis response
+              {t('app.openSource')}
             </p>
           </div>
         </div>

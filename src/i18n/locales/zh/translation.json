@@ -1,0 +1,89 @@
+{
+  "app": {
+    "title": "联合国开发计划署危机响应平台",
+    "subtitle": "社区支持的损害评估与快速响应",
+    "poweredBy": "由联合国开发计划署提供支持",
+    "openSource": "社区支持的危机响应开源平台"
+  },
+  "nav": {
+    "submit": "提交报告",
+    "map": "查看地图",
+    "export": "导出数据"
+  },
+  "submit": {
+    "title": "提交危机报告",
+    "helpTitle": "帮助我们更快响应",
+    "helpText": "分享受损基础设施的照片和信息，帮助紧急响应人员优先安排援助和恢复工作。",
+    "photoLabel": "损害照片",
+    "photoRequired": "必填",
+    "uploadPhoto": "上传照片",
+    "infrastructureType": "基础设施类型",
+    "selectType": "选择类型",
+    "types": {
+      "hospital": "医院/医疗设施",
+      "school": "学校/教育设施",
+      "residential": "住宅建筑",
+      "road": "道路/公路",
+      "bridge": "桥梁",
+      "water": "供水设施",
+      "electricity": "电力基础设施",
+      "communications": "通讯设施",
+      "other": "其他"
+    },
+    "damageLevel": "损害程度",
+    "damageLevels": {
+      "minimal": "轻微",
+      "partial": "部分",
+      "destroyed": "完全损毁"
+    },
+    "description": "描述",
+    "descriptionPlaceholder": "描述损害和情况...",
+    "location": "位置",
+    "updateLocation": "更新位置",
+    "gettingLocation": "正在获取位置...",
+    "latitude": "纬度",
+    "longitude": "经度",
+    "locationName": "位置名称（可选）",
+    "contactLabel": "您的联系方式（可选）",
+    "contactPlaceholder": "姓名或电话号码",
+    "submitReport": "提交报告",
+    "submitting": "提交中...",
+    "successMessage": "提交成功！感谢您的报告。",
+    "photoRequired": "请上传照片",
+    "locationRequired": "请启用定位服务或手动输入坐标",
+    "geolocationNotSupported": "您的浏览器不支持地理定位",
+    "locationError": "无法获取位置。请启用定位服务或手动输入。",
+    "submitError": "提交报告时出错。请重试。"
+  },
+  "map": {
+    "legendTitle": "损害图例",
+    "reports": "份报告",
+    "reports_plural": "份报告",
+    "damage": "损害"
+  },
+  "detail": {
+    "title": "报告详情",
+    "description": "描述",
+    "location": "位置",
+    "submitted": "提交时间",
+    "contact": "联系方式",
+    "viewOnGoogleMaps": "在谷歌地图上查看",
+    "viewFullImage": "查看完整图片"
+  },
+  "export": {
+    "title": "导出数据",
+    "description": "导出危机报告以进行分析和报告。可用格式：",
+    "csvTitle": "CSV格式",
+    "csvDesc": "Excel兼容电子表格",
+    "jsonTitle": "JSON格式",
+    "jsonDesc": "用于API和应用程序的结构化数据",
+    "geojsonTitle": "GeoJSON格式",
+    "geojsonDesc": "用于地图工具的地理数据",
+    "totalSubmissions": "报告总数",
+    "minimalDamage": "轻微损害",
+    "partialDamage": "部分损害",
+    "destroyed": "完全损毁",
+    "noData": "没有可导出的数据"
+  },
+  "loading": "正在加载报告..."
+}

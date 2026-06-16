@@ -1,0 +1,89 @@
+{
+  "app": {
+    "title": "Plateforme de Réponse aux Crises du PNUD",
+    "subtitle": "Évaluation des dégâts et réponse rapide portées par la communauté",
+    "poweredBy": "Propulsé par le Programme des Nations Unies pour le Développement (PNUD)",
+    "openSource": "Plateforme open-source de réponse aux crises portée par la communauté"
+  },
+  "nav": {
+    "submit": "Soumettre un Rapport",
+    "map": "Voir la Carte",
+    "export": "Exporter les Données"
+  },
+  "submit": {
+    "title": "Soumettre un Rapport de Crise",
+    "helpTitle": "Aidez-nous à répondre plus rapidement",
+    "helpText": "Partagez des photos et des informations sur les infrastructures endommagées pour aider les intervenants d'urgence à prioriser l'aide et les efforts de rétablissement.",
+    "photoLabel": "Photo des Dégâts",
+    "photoRequired": "obligatoire",
+    "uploadPhoto": "Télécharger Photo",
+    "infrastructureType": "Type d'Infrastructure",
+    "selectType": "Sélectionner le type",
+    "types": {
+      "hospital": "Hôpital/Établissement Médical",
+      "school": "École/Établissement Éducatif",
+      "residential": "Bâtiment Résidentiel",
+      "road": "Route/Autoroute",
+      "bridge": "Pont",
+      "water": "Approvisionnement en Eau",
+      "electricity": "Infrastructure Électrique",
+      "communications": "Communications",
+      "other": "Autre"
+    },
+    "damageLevel": "Niveau de Dommages",
+    "damageLevels": {
+      "minimal": "Minimal",
+      "partial": "Partiel",
+      "destroyed": "Détruit"
+    },
+    "description": "Description",
+    "descriptionPlaceholder": "Décrivez les dégâts et la situation...",
+    "location": "Localisation",
+    "updateLocation": "Mettre à jour la Localisation",
+    "gettingLocation": "Obtention de la localisation...",
+    "latitude": "Latitude",
+    "longitude": "Longitude",
+    "locationName": "Nom du lieu (optionnel)",
+    "contactLabel": "Vos Coordonnées (Optionnel)",
+    "contactPlaceholder": "Nom ou numéro de téléphone",
+    "submitReport": "Soumettre le Rapport",
+    "submitting": "Soumission...",
+    "successMessage": "Soumission réussie ! Merci pour votre rapport.",
+    "photoRequired": "Veuillez télécharger une photo",
+    "locationRequired": "Veuillez activer les services de localisation ou entrer les coordonnées manuellement",
+    "geolocationNotSupported": "La géolocalisation n'est pas prise en charge par votre navigateur",
+    "locationError": "Impossible d'obtenir la localisation. Veuillez activer les services de localisation ou saisir manuellement.",
+    "submitError": "Erreur lors de la soumission du rapport. Veuillez réessayer."
+  },
+  "map": {
+    "legendTitle": "Légende des Dommages",
+    "reports": "Rapport",
+    "reports_plural": "Rapports",
+    "damage": "DOMMAGES"
+  },
+  "detail": {
+    "title": "Détails de la Soumission",
+    "description": "Description",
+    "location": "Localisation",
+    "submitted": "Soumis",
+    "contact": "Contact",
+    "viewOnGoogleMaps": "Voir sur Google Maps",
+    "viewFullImage": "Voir l'Image Complète"
+  },
+  "export": {
+    "title": "Exporter les Données",
+    "description": "Exportez les soumissions de crise pour l'analyse et les rapports. Formats disponibles :",
+    "csvTitle": "Format CSV",
+    "csvDesc": "Feuille de calcul compatible Excel",
+    "jsonTitle": "Format JSON",
+    "jsonDesc": "Données structurées pour API et applications",
+    "geojsonTitle": "Format GeoJSON",
+    "geojsonDesc": "Données géographiques pour outils cartographiques",
+    "totalSubmissions": "Total des Soumissions",
+    "minimalDamage": "Dommages Minimaux",
+    "partialDamage": "Dommages Partiels",
+    "destroyed": "Détruit",
+    "noData": "Aucune donnée à exporter"
+  },
+  "loading": "Chargement des soumissions..."
+}

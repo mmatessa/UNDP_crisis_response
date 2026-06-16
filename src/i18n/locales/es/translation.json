@@ -1,0 +1,89 @@
+{
+  "app": {
+    "title": "Plataforma de Respuesta a Crisis del PNUD",
+    "subtitle": "Evaluación de daños y respuesta rápida impulsada por la comunidad",
+    "poweredBy": "Impulsado por el Programa de las Naciones Unidas para el Desarrollo (PNUD)",
+    "openSource": "Plataforma de código abierto para respuesta a crisis impulsada por la comunidad"
+  },
+  "nav": {
+    "submit": "Enviar Informe",
+    "map": "Ver Mapa",
+    "export": "Exportar Datos"
+  },
+  "submit": {
+    "title": "Enviar Informe de Crisis",
+    "helpTitle": "Ayúdanos a responder más rápido",
+    "helpText": "Comparte fotos e información sobre infraestructura dañada para ayudar a los socorristas a priorizar la ayuda y los esfuerzos de recuperación.",
+    "photoLabel": "Foto del Daño",
+    "photoRequired": "obligatorio",
+    "uploadPhoto": "Subir Foto",
+    "infrastructureType": "Tipo de Infraestructura",
+    "selectType": "Seleccionar tipo",
+    "types": {
+      "hospital": "Hospital/Centro Médico",
+      "school": "Escuela/Centro Educativo",
+      "residential": "Edificio Residencial",
+      "road": "Carretera/Autopista",
+      "bridge": "Puente",
+      "water": "Suministro de Agua",
+      "electricity": "Infraestructura Eléctrica",
+      "communications": "Comunicaciones",
+      "other": "Otro"
+    },
+    "damageLevel": "Nivel de Daño",
+    "damageLevels": {
+      "minimal": "Mínimo",
+      "partial": "Parcial",
+      "destroyed": "Destruido"
+    },
+    "description": "Descripción",
+    "descriptionPlaceholder": "Describe el daño y la situación...",
+    "location": "Ubicación",
+    "updateLocation": "Actualizar Ubicación",
+    "gettingLocation": "Obteniendo ubicación...",
+    "latitude": "Latitud",
+    "longitude": "Longitud",
+    "locationName": "Nombre del lugar (opcional)",
+    "contactLabel": "Tu Contacto (Opcional)",
+    "contactPlaceholder": "Nombre o número de teléfono",
+    "submitReport": "Enviar Informe",
+    "submitting": "Enviando...",
+    "successMessage": "¡Envío exitoso! Gracias por tu informe.",
+    "photoRequired": "Por favor sube una foto",
+    "locationRequired": "Por favor habilita los servicios de ubicación o ingresa las coordenadas manualmente",
+    "geolocationNotSupported": "La geolocalización no es compatible con tu navegador",
+    "locationError": "No se puede obtener la ubicación. Por favor habilita los servicios de ubicación o ingrésala manualmente.",
+    "submitError": "Error al enviar el informe. Por favor intenta de nuevo."
+  },
+  "map": {
+    "legendTitle": "Leyenda de Daños",
+    "reports": "informe",
+    "reports_plural": "informes",
+    "damage": "DAÑO"
+  },
+  "detail": {
+    "title": "Detalles del Informe",
+    "description": "Descripción",
+    "location": "Ubicación",
+    "submitted": "Enviado",
+    "contact": "Contacto",
+    "viewOnGoogleMaps": "Ver en Google Maps",
+    "viewFullImage": "Ver Imagen Completa"
+  },
+  "export": {
+    "title": "Exportar Datos",
+    "description": "Exporta los informes de crisis para análisis e informes. Formatos disponibles:",
+    "csvTitle": "Formato CSV",
+    "csvDesc": "Hoja de cálculo compatible con Excel",
+    "jsonTitle": "Formato JSON",
+    "jsonDesc": "Datos estructurados para APIs y aplicaciones",
+    "geojsonTitle": "Formato GeoJSON",
+    "geojsonDesc": "Datos geográficos para herramientas de mapeo",
+    "totalSubmissions": "Total de Informes",
+    "minimalDamage": "Daño Mínimo",
+    "partialDamage": "Daño Parcial",
+    "destroyed": "Destruido",
+    "noData": "Sin datos para exportar"
+  },
+  "loading": "Cargando informes..."
+}

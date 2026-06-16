@@ -1,0 +1,89 @@
+{
+  "app": {
+    "title": "UNDP Crisis Response Platform",
+    "subtitle": "Community-powered damage assessment and rapid response",
+    "poweredBy": "Powered by the United Nations Development Programme (UNDP)",
+    "openSource": "Open-source platform for community-powered crisis response"
+  },
+  "nav": {
+    "submit": "Submit Report",
+    "map": "View Map",
+    "export": "Export Data"
+  },
+  "submit": {
+    "title": "Submit Crisis Report",
+    "helpTitle": "Help us respond faster",
+    "helpText": "Share photos and information about damaged infrastructure to help emergency responders prioritize aid and recovery efforts.",
+    "photoLabel": "Photo of Damage",
+    "photoRequired": "required",
+    "uploadPhoto": "Upload Photo",
+    "infrastructureType": "Infrastructure Type",
+    "selectType": "Select type",
+    "types": {
+      "hospital": "Hospital/Medical Facility",
+      "school": "School/Educational Facility",
+      "residential": "Residential Building",
+      "road": "Road/Highway",
+      "bridge": "Bridge",
+      "water": "Water Supply",
+      "electricity": "Electricity Infrastructure",
+      "communications": "Communications",
+      "other": "Other"
+    },
+    "damageLevel": "Damage Level",
+    "damageLevels": {
+      "minimal": "Minimal",
+      "partial": "Partial",
+      "destroyed": "Destroyed"
+    },
+    "description": "Description",
+    "descriptionPlaceholder": "Describe the damage and situation...",
+    "location": "Location",
+    "updateLocation": "Update Location",
+    "gettingLocation": "Getting Location...",
+    "latitude": "Latitude",
+    "longitude": "Longitude",
+    "locationName": "Location name (optional)",
+    "contactLabel": "Your Contact (Optional)",
+    "contactPlaceholder": "Name or phone number",
+    "submitReport": "Submit Report",
+    "submitting": "Submitting...",
+    "successMessage": "Submission successful! Thank you for your report.",
+    "photoRequired": "Please upload a photo",
+    "locationRequired": "Please enable location services or enter coordinates manually",
+    "geolocationNotSupported": "Geolocation is not supported by your browser",
+    "locationError": "Unable to get location. Please enable location services or enter manually.",
+    "submitError": "Error submitting report. Please try again."
+  },
+  "map": {
+    "legendTitle": "Damage Legend",
+    "reports": "Report",
+    "reports_plural": "Reports",
+    "damage": "DAMAGE"
+  },
+  "detail": {
+    "title": "Submission Details",
+    "description": "Description",
+    "location": "Location",
+    "submitted": "Submitted",
+    "contact": "Contact",
+    "viewOnGoogleMaps": "View on Google Maps",
+    "viewFullImage": "View Full Image"
+  },
+  "export": {
+    "title": "Export Data",
+    "description": "Export crisis submissions for analysis and reporting. Available formats:",
+    "csvTitle": "CSV Format",
+    "csvDesc": "Excel-compatible spreadsheet",
+    "jsonTitle": "JSON Format",
+    "jsonDesc": "Structured data for APIs and applications",
+    "geojsonTitle": "GeoJSON Format",
+    "geojsonDesc": "Geographic data for mapping tools",
+    "totalSubmissions": "Total Submissions",
+    "minimalDamage": "Minimal Damage",
+    "partialDamage": "Partial Damage",
+    "destroyed": "Destroyed",
+    "noData": "No data to export"
+  },
+  "loading": "Loading submissions..."
+}

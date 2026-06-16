@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import type { CrisisSubmission } from '../types/database';
@@ -9,6 +10,7 @@ interface MapViewProps {
 }
 
 export default function MapView({ submissions, onSelectSubmission }: MapViewProps) {
+  const { t } = useTranslation();
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<L.Map | null>(null);
   const markers = useRef<L.Marker[]>([]);
@@ -54,10 +56,10 @@ export default function MapView({ submissions, onSelectSubmission }: MapViewProp
       })
         .bindPopup(
           `<div class="max-w-xs">
-            <div class="font-semibold mb-2 text-sm">${submission.infrastructure_type.replace('_', ' ').toUpperCase()}</div>
-            <div class="text-xs mb-2">${submission.damage_level.toUpperCase()} DAMAGE</div>
+            <div class="font-semibold mb-2 text-sm">${t(`submit.types.${submission.infrastructure_type}`, submission.infrastructure_type).toUpperCase()}</div>
+            <div class="text-xs mb-2">${t(`submit.damageLevels.${submission.damage_level}`).toUpperCase()} ${t('map.damage')}</div>
             <div class="text-xs text-gray-600 mb-3">${submission.description.substring(0, 100)}${submission.description.length > 100 ? '...' : ''}</div>
-            <button class="w-full bg-blue-600 text-white py-1 px-2 rounded text-xs hover:bg-blue-700">View Details</button>
+            <button class="w-full bg-blue-600 text-white py-1 px-2 rounded text-xs hover:bg-blue-700">${t('detail.title')}</button>
           </div>`,
           { maxWidth: 300 }
         )
@@ -73,39 +75,36 @@ export default function MapView({ submissions, onSelectSubmission }: MapViewProp
     });
 
     if (submissions.length > 0 && map.current) {
-      const avgLat = submissions.reduce((sum, s) => sum + Number(s.latitude), 0) / submissions.length;
-      const avgLng = submissions.reduce((sum, s) => sum + Number(s.longitude), 0) / submissions.length;
-
       const group = new L.FeatureGroup(markers.current);
       map.current.fitBounds(group.getBounds().pad(0.1), { maxZoom: 12 });
     }
-  }, [submissions, onSelectSubmission]);
+  }, [submissions, onSelectSubmission, t]);
 
   return (
     <div className="relative w-full h-full rounded-lg overflow-hidden bg-gray-200">
       <div ref={mapContainer} className="w-full h-full" />
 
       <div className="absolute top-4 left-4 bg-white rounded-lg shadow-lg p-4 z-[400]">
-        <h3 className="font-semibold text-gray-900 mb-2 text-sm">Damage Legend</h3>
+        <h3 className="font-semibold text-gray-900 mb-2 text-sm">{t('map.legendTitle')}</h3>
         <div className="space-y-2 text-xs">
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#eab308' }}></div>
-            <span>Minimal</span>
+            <span>{t('submit.damageLevels.minimal')}</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#f97316' }}></div>
-            <span>Partial</span>
+            <span>{t('submit.damageLevels.partial')}</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#ef4444' }}></div>
-            <span>Destroyed</span>
+            <span>{t('submit.damageLevels.destroyed')}</span>
           </div>
         </div>
       </div>
 
       <div className="absolute top-4 right-4 bg-white rounded-lg shadow-lg p-4 z-[400]">
         <div className="text-sm font-semibold text-gray-900">
-          {submissions.length} Report{submissions.length !== 1 ? 's' : ''}
+          {submissions.length} {submissions.length === 1 ? t('map.reports') : t('map.reports_plural')}
         </div>
       </div>
     </div>

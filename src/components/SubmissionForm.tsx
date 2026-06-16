@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Camera, MapPin, Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '../lib/supabase';
 import type { DamageLevel } from '../types/database';
 
@@ -8,6 +9,7 @@ interface SubmissionFormProps {
 }
 
 export default function SubmissionForm({ onSubmitSuccess }: SubmissionFormProps) {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string>('');
@@ -32,12 +34,12 @@ export default function SubmissionForm({ onSubmitSuccess }: SubmissionFormProps)
         },
         (error) => {
           console.error('Error getting location:', error);
-          alert('Unable to get location. Please enable location services or enter manually.');
+          alert(t('submit.locationError'));
           setGettingLocation(false);
         }
       );
     } else {
-      alert('Geolocation is not supported by your browser');
+      alert(t('submit.geolocationNotSupported'));
       setGettingLocation(false);
     }
   };
@@ -82,12 +84,12 @@ export default function SubmissionForm({ onSubmitSuccess }: SubmissionFormProps)
     e.preventDefault();
 
     if (!photoFile) {
-      alert('Please upload a photo');
+      alert(t('submit.photoRequired'));
       return;
     }
 
     if (!coordinates) {
-      alert('Please enable location services or enter coordinates manually');
+      alert(t('submit.locationRequired'));
       return;
     }
 
@@ -109,7 +111,7 @@ export default function SubmissionForm({ onSubmitSuccess }: SubmissionFormProps)
 
       if (error) throw error;
 
-      alert('Submission successful! Thank you for your report.');
+      alert(t('submit.successMessage'));
 
       setPhotoFile(null);
       setPhotoPreview('');
@@ -122,24 +124,29 @@ export default function SubmissionForm({ onSubmitSuccess }: SubmissionFormProps)
       onSubmitSuccess();
     } catch (error) {
       console.error('Error submitting:', error);
-      alert('Error submitting report. Please try again.');
+      alert(t('submit.submitError'));
     } finally {
       setLoading(false);
     }
   };
 
+  const infrastructureTypes = [
+    'hospital', 'school', 'residential', 'road', 'bridge',
+    'water', 'electricity', 'communications', 'other'
+  ];
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded-lg shadow-lg">
-      <h2 className="text-2xl font-bold text-gray-900">Submit Crisis Report</h2>
+      <h2 className="text-2xl font-bold text-gray-900">{t('submit.title')}</h2>
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Photo of Damage *
+          {t('submit.photoLabel')} <span className="text-red-500">*</span>
         </label>
         <div className="flex items-center gap-4">
           <label className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg cursor-pointer hover:bg-blue-700 transition">
             <Camera size={20} />
-            <span>Upload Photo</span>
+            <span>{t('submit.uploadPhoto')}</span>
             <input
               type="file"
               accept="image/*"
@@ -156,7 +163,7 @@ export default function SubmissionForm({ onSubmitSuccess }: SubmissionFormProps)
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Infrastructure Type *
+          {t('submit.infrastructureType')} <span className="text-red-500">*</span>
         </label>
         <select
           value={infrastructureType}
@@ -164,22 +171,16 @@ export default function SubmissionForm({ onSubmitSuccess }: SubmissionFormProps)
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           required
         >
-          <option value="">Select type</option>
-          <option value="hospital">Hospital/Medical Facility</option>
-          <option value="school">School/Educational Facility</option>
-          <option value="residential">Residential Building</option>
-          <option value="road">Road/Highway</option>
-          <option value="bridge">Bridge</option>
-          <option value="water">Water Supply</option>
-          <option value="electricity">Electricity Infrastructure</option>
-          <option value="communications">Communications</option>
-          <option value="other">Other</option>
+          <option value="">{t('submit.selectType')}</option>
+          {infrastructureTypes.map((type) => (
+            <option key={type} value={type}>{t(`submit.types.${type}`)}</option>
+          ))}
         </select>
       </div>
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Damage Level *
+          {t('submit.damageLevel')} <span className="text-red-500">*</span>
         </label>
         <div className="grid grid-cols-3 gap-3">
           {(['minimal', 'partial', 'destroyed'] as DamageLevel[]).map((level) => (
@@ -197,7 +198,7 @@ export default function SubmissionForm({ onSubmitSuccess }: SubmissionFormProps)
                   : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
               }`}
             >
-              {level.charAt(0).toUpperCase() + level.slice(1)}
+              {t(`submit.damageLevels.${level}`)}
             </button>
           ))}
         </div>
@@ -205,21 +206,21 @@ export default function SubmissionForm({ onSubmitSuccess }: SubmissionFormProps)
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Description *
+          {t('submit.description')} <span className="text-red-500">*</span>
         </label>
         <textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           rows={4}
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder="Describe the damage and situation..."
+          placeholder={t('submit.descriptionPlaceholder')}
           required
         />
       </div>
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Location
+          {t('submit.location')}
         </label>
         <div className="space-y-3">
           <button
@@ -229,12 +230,12 @@ export default function SubmissionForm({ onSubmitSuccess }: SubmissionFormProps)
             className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition disabled:opacity-50"
           >
             {gettingLocation ? <Loader2 size={20} className="animate-spin" /> : <MapPin size={20} />}
-            <span>{gettingLocation ? 'Getting Location...' : 'Update Location'}</span>
+            <span>{gettingLocation ? t('submit.gettingLocation') : t('submit.updateLocation')}</span>
           </button>
           {coordinates && (
             <div className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
-              <p>Latitude: {coordinates.lat.toFixed(6)}</p>
-              <p>Longitude: {coordinates.lng.toFixed(6)}</p>
+              <p>{t('submit.latitude')}: {coordinates.lat.toFixed(6)}</p>
+              <p>{t('submit.longitude')}: {coordinates.lng.toFixed(6)}</p>
             </div>
           )}
           <input
@@ -242,21 +243,21 @@ export default function SubmissionForm({ onSubmitSuccess }: SubmissionFormProps)
             value={locationName}
             onChange={(e) => setLocationName(e.target.value)}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="Location name (optional)"
+            placeholder={t('submit.locationName')}
           />
         </div>
       </div>
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Your Contact (Optional)
+          {t('submit.contactLabel')}
         </label>
         <input
           type="text"
           value={submittedBy}
           onChange={(e) => setSubmittedBy(e.target.value)}
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder="Name or phone number"
+          placeholder={t('submit.contactPlaceholder')}
         />
       </div>
 
@@ -268,10 +269,10 @@ export default function SubmissionForm({ onSubmitSuccess }: SubmissionFormProps)
         {loading ? (
           <>
             <Loader2 size={20} className="animate-spin" />
-            <span>Submitting...</span>
+            <span>{t('submit.submitting')}</span>
           </>
         ) : (
-          <span>Submit Report</span>
+          <span>{t('submit.submitReport')}</span>
         )}
       </button>
     </form>

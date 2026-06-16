@@ -1,4 +1,5 @@
 import { Download, FileJson, FileSpreadsheet, Map } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { exportToCSV, exportToJSON, exportToGeoJSON } from '../utils/exportData';
 import type { CrisisSubmission } from '../types/database';
 
@@ -7,9 +8,11 @@ interface ExportPanelProps {
 }
 
 export default function ExportPanel({ submissions }: ExportPanelProps) {
+  const { t } = useTranslation();
+
   const handleExport = (format: 'csv' | 'json' | 'geojson') => {
     if (submissions.length === 0) {
-      alert('No data to export');
+      alert(t('export.noData'));
       return;
     }
 
@@ -30,12 +33,12 @@ export default function ExportPanel({ submissions }: ExportPanelProps) {
     <div className="bg-white rounded-lg shadow-lg p-6">
       <div className="flex items-center gap-3 mb-6">
         <Download className="text-blue-600" size={24} />
-        <h2 className="text-2xl font-bold text-gray-900">Export Data</h2>
+        <h2 className="text-2xl font-bold text-gray-900">{t('export.title')}</h2>
       </div>
 
       <div className="space-y-4">
         <p className="text-gray-600 mb-6">
-          Export crisis submissions for analysis and reporting. Available formats:
+          {t('export.description')}
         </p>
 
         <button
@@ -44,8 +47,8 @@ export default function ExportPanel({ submissions }: ExportPanelProps) {
         >
           <FileSpreadsheet className="text-green-600 group-hover:text-blue-600" size={24} />
           <div className="text-left flex-1">
-            <div className="font-semibold text-gray-900">CSV Format</div>
-            <div className="text-sm text-gray-600">Excel-compatible spreadsheet</div>
+            <div className="font-semibold text-gray-900">{t('export.csvTitle')}</div>
+            <div className="text-sm text-gray-600">{t('export.csvDesc')}</div>
           </div>
         </button>
 
@@ -55,8 +58,8 @@ export default function ExportPanel({ submissions }: ExportPanelProps) {
         >
           <FileJson className="text-blue-600 group-hover:text-blue-600" size={24} />
           <div className="text-left flex-1">
-            <div className="font-semibold text-gray-900">JSON Format</div>
-            <div className="text-sm text-gray-600">Structured data for APIs and applications</div>
+            <div className="font-semibold text-gray-900">{t('export.jsonTitle')}</div>
+            <div className="text-sm text-gray-600">{t('export.jsonDesc')}</div>
           </div>
         </button>
 
@@ -66,31 +69,31 @@ export default function ExportPanel({ submissions }: ExportPanelProps) {
         >
           <Map className="text-red-600 group-hover:text-blue-600" size={24} />
           <div className="text-left flex-1">
-            <div className="font-semibold text-gray-900">GeoJSON Format</div>
-            <div className="text-sm text-gray-600">Geographic data for mapping tools</div>
+            <div className="font-semibold text-gray-900">{t('export.geojsonTitle')}</div>
+            <div className="text-sm text-gray-600">{t('export.geojsonDesc')}</div>
           </div>
         </button>
 
         <div className="mt-6 pt-6 border-t border-gray-200">
           <div className="text-sm text-gray-600">
             <div className="flex justify-between mb-2">
-              <span>Total Submissions:</span>
+              <span>{t('export.totalSubmissions')}:</span>
               <span className="font-semibold">{submissions.length}</span>
             </div>
             <div className="flex justify-between mb-2">
-              <span>Minimal Damage:</span>
+              <span>{t('export.minimalDamage')}:</span>
               <span className="font-semibold text-yellow-600">
                 {submissions.filter((s) => s.damage_level === 'minimal').length}
               </span>
             </div>
             <div className="flex justify-between mb-2">
-              <span>Partial Damage:</span>
+              <span>{t('export.partialDamage')}:</span>
               <span className="font-semibold text-orange-600">
                 {submissions.filter((s) => s.damage_level === 'partial').length}
               </span>
             </div>
             <div className="flex justify-between">
-              <span>Destroyed:</span>
+              <span>{t('export.destroyed')}:</span>
               <span className="font-semibold text-red-600">
                 {submissions.filter((s) => s.damage_level === 'destroyed').length}
               </span>
