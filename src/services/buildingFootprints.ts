@@ -108,7 +108,7 @@ export async function fetchBuildingFootprints(
   `;
 
   try {
-    const response = await fetch('https://overpass.kumi.systems/api/interpreter' {
+    const response = await fetch('https://overpass.kumi.systems/api/interpreter', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
