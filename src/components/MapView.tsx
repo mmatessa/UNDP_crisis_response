@@ -33,6 +33,7 @@ export default function MapView({
   const [zoom, setZoom] = useState(initialZoom);
   const [isLoadingBuildings, setIsLoadingBuildings] = useState(false);
   const [buildingError, setBuildingError] = useState<string | null>(null);
+  const [mapReady, setMapReady] = useState(false);
 
   const handleBuildingSelect = useCallback(
     (building: BuildingFootprint | null) => {
@@ -44,7 +45,7 @@ export default function MapView({
   );
 
   useBuildingFootprintLayer({
-    map: map.current,
+    map: mapReady ? map.current : null,
     selectedBuilding: selectedBuilding || null,
     onSelectBuilding: handleBuildingSelect,
     enabled: enableBuildingSelection,
@@ -56,6 +57,8 @@ export default function MapView({
 
     if (!map.current) {
       map.current = L.map(mapContainer.current).setView(initialCenter, initialZoom);
+      map.current = L.map(mapContainer.current).setView(initialCenter, initialZoom);
+setMapReady(true);
 
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors',
