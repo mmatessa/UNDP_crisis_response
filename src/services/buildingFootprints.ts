@@ -99,7 +99,7 @@ export async function fetchBuildingFootprints(
   const bbox = `${bounds.getSouth()},${bounds.getWest()},${bounds.getNorth()},${bounds.getEast()}`;
 
   const query = `
-    [out:json][timeout:10];
+    [out:json][timeout:25];
     (
       way["building"](${bbox});
       relation["building"](${bbox});
