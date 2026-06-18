@@ -69,7 +69,6 @@ export default function MapView({
 
     if (!map.current) {
       map.current = L.map(mapContainer.current).setView(initialCenter, initialZoom);
-      map.current = L.map(mapContainer.current).setView(initialCenter, initialZoom);
 setMapReady(true);
 
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
