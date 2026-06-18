@@ -9,6 +9,7 @@ import { Loader2 } from 'lucide-react';
 
 interface MapViewProps {
   submissions: CrisisSubmission[];
+  allSubmissions?: CrisisSubmission[];
   onSelectSubmission: (submission: CrisisSubmission) => void;
   onBuildingSelect?: (building: BuildingFootprint | null) => void;
   selectedBuilding?: BuildingFootprint | null;
@@ -17,8 +18,19 @@ interface MapViewProps {
   initialZoom?: number;
 }
 
+const PROXIMITY_THRESHOLD = 0.0001;
+
+function getReportCount(lat: number, lng: number, allSubmissions: CrisisSubmission[]): number {
+  return allSubmissions.filter((s) => {
+    const sLat = Number(s.latitude);
+    const sLng = Number(s.longitude);
+    return Math.abs(lat - sLat) <= PROXIMITY_THRESHOLD && Math.abs(lng - sLng) <= PROXIMITY_THRESHOLD;
+  }).length;
+}
+
 export default function MapView({
   submissions,
+  allSubmissions,
   onSelectSubmission,
   onBuildingSelect,
   selectedBuilding,
@@ -83,17 +95,26 @@ setMapReady(true);
 
     if (submissions.length === 0) return;
 
+    const allSubs = allSubmissions || submissions;
     submissions.forEach((submission) => {
       const lat = Number(submission.latitude);
       const lng = Number(submission.longitude);
+      const reportCount = getReportCount(lat, lng, allSubs);
 
       let color = '#eab308';
       if (submission.damage_level === 'partial') color = '#f97316';
       if (submission.damage_level === 'destroyed') color = '#ef4444';
 
+      const badge = reportCount > 1 ? `
+        <div class="absolute -top-1 -right-1 w-4 h-4 bg-white rounded-full flex items-center justify-center text-xs font-bold shadow" style="color: ${color}">
+          ${reportCount}
+        </div>
+      ` : '';
+
       const html = `
-        <div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold shadow-lg" style="background-color: ${color}">
-          ${submissions.filter((s) => Number(s.latitude) === lat && Number(s.longitude) === lng).length}
+        <div class="relative w-8 h-8 rounded-full flex items-center justify-center text-white font-bold shadow-lg" style="background-color: ${color}">
+          ${reportCount > 1 ? reportCount : ''}
+          ${badge}
         </div>
       `;
 
@@ -133,7 +154,7 @@ setMapReady(true);
       const group = new L.FeatureGroup(markers.current);
       map.current.fitBounds(group.getBounds().pad(0.1), { maxZoom: 12 });
     }
-  }, [submissions, onSelectSubmission, t, enableBuildingSelection, initialCenter, initialZoom]);
+  }, [submissions, allSubmissions, onSelectSubmission, t, enableBuildingSelection, initialCenter, initialZoom]);
 
   const zoomNotice = enableBuildingSelection ? getZoomNotice(zoom) : null;
 
@@ -193,8 +214,13 @@ setMapReady(true);
       {/* Reports count */}
       <div className="absolute top-4 right-4 bg-white rounded-lg shadow-lg p-4 z-[400]">
         <div className="text-sm font-semibold text-gray-900">
-          {submissions.length} {submissions.length === 1 ? t('map.reports') : t('map.reports_plural')}
+          {submissions.length} {submissions.length === 1 ? t('map.locations') : t('map.locations_plural')}
         </div>
+        {allSubmissions && allSubmissions.length > submissions.length && (
+          <div className="text-xs text-gray-600 mt-1">
+            {allSubmissions.length} {allSubmissions.length === 1 ? t('map.reports') : t('map.reports_plural')}
+          </div>
+        )}
       </div>
 
       {/* Selected building info */}

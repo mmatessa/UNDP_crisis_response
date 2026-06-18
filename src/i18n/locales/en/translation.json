@@ -102,6 +102,8 @@
     "legendTitle": "Damage Legend",
     "reports": "Report",
     "reports_plural": "Reports",
+    "locations": "Location",
+    "locations_plural": "Locations",
     "damage": "DAMAGE",
     "clickToSelectBuilding": "Click to select this building",
     "selectedBuilding": "Selected Building",
@@ -126,7 +128,12 @@
     "infrastructureCategory": "Infrastructure Category",
     "infrastructureName": "Infrastructure Name",
     "crisisNature": "Nature of Crisis",
-    "debrisClearance": "Debris Clearance Required"
+    "debrisClearance": "Debris Clearance Required",
+    "versionHistory": "Version History",
+    "latestReport": "Latest Report",
+    "previousReport": "Previous Report",
+    "report": "report",
+    "reports": "reports"
   },
   "export": {
     "title": "Export Data",

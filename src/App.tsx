@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { AlertCircle, Map, Upload, Download, Shield } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import './i18n';
@@ -14,12 +14,47 @@ import LanguageSelector from './components/LanguageSelector';
 
 type Tab = 'submit' | 'map' | 'export';
 
+const PROXIMITY_THRESHOLD = 0.0001; // ~10 meters
+
+function getLatestSubmissions(submissions: CrisisSubmission[]): CrisisSubmission[] {
+  const locationGroups = new Map<string, CrisisSubmission[]>();
+
+  submissions.forEach((submission) => {
+    const lat = Number(submission.latitude);
+    const lng = Number(submission.longitude);
+
+    let foundGroup = false;
+    for (const [key, group] of locationGroups) {
+      const [groupLat, groupLng] = key.split(',').map(Number);
+      if (Math.abs(lat - groupLat) <= PROXIMITY_THRESHOLD && Math.abs(lng - groupLng) <= PROXIMITY_THRESHOLD) {
+        group.push(submission);
+        foundGroup = true;
+        break;
+      }
+    }
+
+    if (!foundGroup) {
+      locationGroups.set(`${lat},${lng}`, [submission]);
+    }
+  });
+
+  const latestSubmissions: CrisisSubmission[] = [];
+  for (const group of locationGroups.values()) {
+    group.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    latestSubmissions.push(group[0]);
+  }
+
+  return latestSubmissions;
+}
+
 function App() {
   const { t, i18n } = useTranslation();
   const [activeTab, setActiveTab] = useState<Tab>('submit');
   const [submissions, setSubmissions] = useState<CrisisSubmission[]>([]);
   const [selectedSubmission, setSelectedSubmission] = useState<CrisisSubmission | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const latestSubmissions = useMemo(() => getLatestSubmissions(submissions), [submissions]);
 
   useEffect(() => {
     const isRtl = rtlLanguages.includes(i18n.language);
@@ -144,7 +179,8 @@ function App() {
             {activeTab === 'map' && (
               <div className="h-[calc(100vh-280px)] min-h-[600px]">
                 <MapView
-                  submissions={submissions}
+                  submissions={latestSubmissions}
+                  allSubmissions={submissions}
                   onSelectSubmission={setSelectedSubmission}
                 />
               </div>
@@ -162,6 +198,7 @@ function App() {
       {selectedSubmission && (
         <SubmissionDetail
           submission={selectedSubmission}
+          allSubmissions={submissions}
           onClose={() => setSelectedSubmission(null)}
         />
       )}

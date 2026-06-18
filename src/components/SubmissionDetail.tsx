@@ -1,13 +1,29 @@
-import { X, MapPin, Calendar, User, Building, AlertTriangle, Trash2 } from 'lucide-react';
+import { X, MapPin, Calendar, User, Building, AlertTriangle, Trash2, History } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { CrisisSubmission } from '../types/database';
 
 interface SubmissionDetailProps {
   submission: CrisisSubmission;
+  allSubmissions?: CrisisSubmission[];
   onClose: () => void;
 }
 
-export default function SubmissionDetail({ submission, onClose }: SubmissionDetailProps) {
+const PROXIMITY_THRESHOLD = 0.0001;
+
+function getRelatedSubmissions(submission: CrisisSubmission, allSubmissions: CrisisSubmission[]): CrisisSubmission[] {
+  const lat = Number(submission.latitude);
+  const lng = Number(submission.longitude);
+
+  const related = allSubmissions.filter((s) => {
+    const sLat = Number(s.latitude);
+    const sLng = Number(s.longitude);
+    return Math.abs(lat - sLat) <= PROXIMITY_THRESHOLD && Math.abs(lng - sLng) <= PROXIMITY_THRESHOLD;
+  });
+
+  return related.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+}
+
+export default function SubmissionDetail({ submission, allSubmissions, onClose }: SubmissionDetailProps) {
   const { t, i18n } = useTranslation();
 
   const getDamageBadgeClass = (level: string) => {
@@ -23,10 +39,32 @@ export default function SubmissionDetail({ submission, onClose }: SubmissionDeta
     }
   };
 
+  const getDamageDotColor = (level: string) => {
+    switch (level) {
+      case 'minimal':
+        return '#eab308';
+      case 'partial':
+        return '#f97316';
+      case 'destroyed':
+        return '#ef4444';
+      default:
+        return '#6b7280';
+    }
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString(i18n.language, {
       year: 'numeric',
       month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
+  const formatShortDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString(i18n.language, {
+      month: 'short',
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
@@ -39,6 +77,11 @@ export default function SubmissionDetail({ submission, onClose }: SubmissionDeta
     }
     return t(`submit.infrastructureTypes.${type}`, type.replace(/_/g, ' '));
   };
+
+  const relatedSubmissions = allSubmissions ? getRelatedSubmissions(submission, allSubmissions) : [submission];
+  const hasVersionHistory = relatedSubmissions.length > 1;
+  const currentSubmissionIndex = relatedSubmissions.findIndex((s) => s.id === submission.id);
+  const isLatest = currentSubmissionIndex === 0;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[9999]">
@@ -151,6 +194,82 @@ export default function SubmissionDetail({ submission, onClose }: SubmissionDeta
               </div>
             )}
           </div>
+
+          {/* Version History */}
+          {hasVersionHistory && (
+            <div className="border-t border-gray-200 pt-6">
+              <div className="flex items-center gap-2 mb-4">
+                <History className="text-blue-600" size={20} />
+                <h3 className="text-lg font-semibold text-gray-900">{t('detail.versionHistory')}</h3>
+                <span className="ml-auto text-sm text-gray-500">
+                  {relatedSubmissions.length} {relatedSubmissions.length === 1 ? t('detail.report') : t('detail.reports')}
+                </span>
+              </div>
+
+              <div className="relative">
+                {relatedSubmissions.map((relatedSubmission, index) => {
+                  const isCurrentSubmission = relatedSubmission.id === submission.id;
+                  const isLatestReport = index === 0;
+
+                  return (
+                    <div
+                      key={relatedSubmission.id}
+                      className={`relative pl-8 pb-4 ${
+                        index < relatedSubmissions.length - 1 ? 'border-l-2 border-gray-200' : ''
+                      }`}
+                    >
+                      {/* Timeline dot */}
+                      <div
+                        className={`absolute left-0 top-0 w-4 h-4 rounded-full -translate-x-[9px] ${
+                          isCurrentSubmission ? 'ring-4 ring-blue-100' : ''
+                        }`}
+                        style={{ backgroundColor: getDamageDotColor(relatedSubmission.damage_level) }}
+                      />
+
+                      <div
+                        className={`p-4 rounded-lg ${
+                          isCurrentSubmission
+                            ? 'bg-blue-50 border-2 border-blue-200'
+                            : 'bg-gray-50 border border-gray-200'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className={`text-xs font-semibold ${
+                            isLatestReport ? 'text-green-700' : 'text-gray-500'
+                          }`}>
+                            {isLatestReport
+                              ? t('detail.latestReport')
+                              : `${t('detail.previousReport')} - ${formatShortDate(relatedSubmission.created_at)}`}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-2 mb-2">
+                          <span
+                            className="w-2 h-2 rounded-full"
+                            style={{ backgroundColor: getDamageDotColor(relatedSubmission.damage_level) }}
+                          />
+                          <span className={`text-sm font-medium ${
+                            isCurrentSubmission ? 'text-gray-900' : 'text-gray-700'
+                          }`}>
+                            {t(`submit.damageLevels.${relatedSubmission.damage_level}`).toUpperCase()}
+                          </span>
+                        </div>
+
+                        <p className={`text-sm ${isCurrentSubmission ? 'text-gray-800' : 'text-gray-600'}`}>
+                          {relatedSubmission.description.substring(0, 120)}
+                          {relatedSubmission.description.length > 120 ? '...' : ''}
+                        </p>
+
+                        <div className="text-xs text-gray-400 mt-2">
+                          {formatDate(relatedSubmission.created_at)}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           <div className="flex gap-3">
             <a
