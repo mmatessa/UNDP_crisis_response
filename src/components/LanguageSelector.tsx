@@ -23,7 +23,7 @@ export default function LanguageSelector() {
           {languages.find(l => l.code === i18n.language)?.nativeName || 'English'}
         </span>
       </button>
-      <div className="absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 min-w-[160px]">
+      <div className="absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[1000] min-w-[160px]">
         {languages.map((lang) => (
           <button
             key={lang.code}
