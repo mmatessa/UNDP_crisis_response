@@ -10,7 +10,7 @@ interface ExportPanelProps {
 export default function ExportPanel({ submissions }: ExportPanelProps) {
   const { t } = useTranslation();
 
-  const handleExport = (format: 'csv' | 'json' | 'geojson') => {
+  const handleExport = (format: 'csv' | 'json' | 'geojson' | 'rapida') => {
     if (submissions.length === 0) {
       alert(t('export.noData'));
       return;
