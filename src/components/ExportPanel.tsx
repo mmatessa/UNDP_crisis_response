@@ -1,6 +1,6 @@
 import { Download, FileJson, FileSpreadsheet, Map } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { exportToCSV, exportToJSON, exportToGeoJSON, exportToRAPIDA } from '../utils/exportData';
+import { exportToCSV, exportToJSON, exportToGeoJSON } from '../utils/exportData';
 import type { CrisisSubmission } from '../types/database';
 
 interface ExportPanelProps {
@@ -10,7 +10,7 @@ interface ExportPanelProps {
 export default function ExportPanel({ submissions }: ExportPanelProps) {
   const { t } = useTranslation();
 
-  const handleExport = (format: 'csv' | 'json' | 'geojson' | 'rapida') => {
+  const handleExport = (format: 'csv' | 'json' | 'geojson') => {
     if (submissions.length === 0) {
       alert(t('export.noData'));
       return;
@@ -25,9 +25,6 @@ export default function ExportPanel({ submissions }: ExportPanelProps) {
         break;
       case 'geojson':
         exportToGeoJSON(submissions);
-        break;
-      case 'rapida':
-        exportToRAPIDA(submissions);
         break;
     }
   };
@@ -77,22 +74,6 @@ export default function ExportPanel({ submissions }: ExportPanelProps) {
           </div>
         </button>
 
-        <button 
-          onClick={() => handleExport('rapida')}
-          className="w-full flex items-center gap-3 p-4 border-2 border-blue-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition group bg-blue-50"
-        >
-          <Download className="text-blue-600" size={24} />
-          <div className="text-left flex-1">
-            <div className="font-semibold text-gray-900">
-              RAPIDA Format (.json)
-            </div>
-            <div className="text-sm text-gray-600">
-              UNDP RAPIDA-compatible export with damage grades G1/G3/G5 
-              for direct integration with crisis assessment workflows
-            </div>
-          </div>
-        </button>
-        
         <div className="mt-6 pt-6 border-t border-gray-200">
           <div className="text-sm text-gray-600">
             <div className="flex justify-between mb-2">
