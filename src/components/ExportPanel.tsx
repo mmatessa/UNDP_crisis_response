@@ -77,7 +77,7 @@ export default function ExportPanel({ submissions }: ExportPanelProps) {
           </div>
         </button>
 
-        <button
+        <button 
           onClick={() => handleExport('rapida')}
           className="w-full flex items-center gap-3 p-4 border-2 border-blue-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition group bg-blue-50"
         >
