@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { AlertCircle, Map, Upload, Download, Shield, Users } from 'lucide-react';
+import { AlertCircle, Map as MapIcon, Upload, Download, Shield, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import './i18n';
 import type { ReportConfirmation } from './types/database';
@@ -147,7 +147,7 @@ function App() {
 
   const tabs = [
     { id: 'submit' as Tab, label: t('nav.submit'), icon: Upload },
-    { id: 'map' as Tab, label: t('nav.map'), icon: Map },
+    { id: 'map' as Tab, label: t('nav.map'), icon: MapIcon },
     { id: 'community' as Tab, label: t('nav.community'), icon: Users },
     { id: 'export' as Tab, label: t('nav.export'), icon: Download },
   ];
