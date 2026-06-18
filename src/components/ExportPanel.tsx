@@ -1,8 +1,7 @@
 import { Download, FileJson, FileSpreadsheet, Map } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { exportToCSV, exportToJSON, exportToGeoJSON } from '../utils/exportData';
-import type { CrisisSubmission } from '../types/database';
 import { exportToCSV, exportToJSON, exportToGeoJSON, exportToRAPIDA } from '../utils/exportData';
+import type { CrisisSubmission } from '../types/database';
 
 interface ExportPanelProps {
   submissions: CrisisSubmission[];
