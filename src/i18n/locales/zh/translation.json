@@ -8,6 +8,7 @@
   "nav": {
     "submit": "提交报告",
     "map": "查看地图",
+    "community": "社区",
     "export": "导出数据"
   },
   "submit": {
@@ -70,8 +71,9 @@
     "latitude": "纬度",
     "longitude": "经度",
     "locationName": "位置名称（可选）",
-    "contactLabel": "您的联系方式（可选）",
-    "contactPlaceholder": "姓名或电话号码",
+    "contactLabel": "您的姓名或别名（可选）",
+    "contactPlaceholder": "姓名或别名",
+    "aliasBadgeHelp": "提供姓名或别名以获得徽章并出现在社区排行榜上。欢迎匿名提交，同样受到重视。",
     "submitReport": "提交报告",
     "submitting": "提交中...",
     "successMessage": "提交成功！感谢您的报告。",
@@ -91,6 +93,7 @@
     "currentCoordinates": "当前坐标",
     "osmId": "OSM ID",
     "zoomNotice": "放大到15级以上可查看建筑轮廓",
+    "duplicateLocationNotice": "此位置似乎已被报告过。您的更新有助于保持信息最新！",
     "buildingError": {
       "zoom_too_low": "放大查看建筑轮廓",
       "rate_limited": "请求过多，请稍后再试。",
@@ -102,6 +105,8 @@
     "legendTitle": "损害图例",
     "reports": "份报告",
     "reports_plural": "份报告",
+    "locations": "个位置",
+    "locations_plural": "个位置",
     "damage": "损害",
     "clickToSelectBuilding": "点击选择此建筑",
     "selectedBuilding": "已选建筑",
@@ -126,7 +131,18 @@
     "infrastructureCategory": "基础设施类别",
     "infrastructureName": "基础设施名称",
     "crisisNature": "危机性质",
-    "debrisClearance": "需要清理残骸"
+    "debrisClearance": "需要清理残骸",
+    "versionHistory": "版本历史",
+    "latestReport": "最新报告",
+    "previousReport": "之前的报告",
+    "report": "报告",
+    "reports": "报告",
+    "verifyReport": "验证此报告",
+    "verifyReportHelp": "确认此报告有助于贡献者获得「已验证证人」徽章。欢迎匿名确认。",
+    "confirmReport": "确认报告",
+    "reportConfirmed": "报告已确认",
+    "confirmError": "无法确认报告。请重试。",
+    "contributorBadges": "{{name}} 获得的徽章"
   },
   "export": {
     "title": "导出数据",
@@ -142,6 +158,57 @@
     "partialDamage": "部分损害",
     "destroyed": "完全损毁",
     "noData": "没有可导出的数据"
+  },
+  "badges": {
+    "earned": "已获得",
+    "progress": "{{current}}/{{threshold}}",
+    "firstResponder": {
+      "name": "首批响应者",
+      "description": "提交了第一份报告"
+    },
+    "communityGuardian": {
+      "name": "社区守护者",
+      "description": "从5个不同位置提交了报告"
+    },
+    "crisisMapper": {
+      "name": "危机制图师",
+      "description": "报告了3种不同的危机类型"
+    },
+    "verifiedWitness": {
+      "name": "已验证证人",
+      "description": "报告被其他用户确认"
+    },
+    "rapidResponder": {
+      "name": "快速响应者",
+      "description": "在危机事件发生后1小时内提交了报告"
+    },
+    "modal": {
+      "title": "报告已提交！",
+      "greetingNamed": "感谢您，{{name}}，感谢您帮助社区。",
+      "greetingAnonymous": "感谢您帮助社区。",
+      "earnedHeading": "您获得的徽章",
+      "noNewBadges": "您的贡献已被记录。继续提交以获得徽章。",
+      "nextBadgeIntro": "您正在向下一个徽章迈进：",
+      "continue": "继续报告"
+    }
+  },
+  "community": {
+    "anonymous": "匿名",
+    "anonymousNote": "欢迎匿名提交，同样受到重视。徽章按别名获得，但不提供别名的贡献同样有影响力。",
+    "statsHeading": "社区统计",
+    "leaderboardHeading": "顶尖贡献者",
+    "noContributors": "尚无贡献者。成为第一个提交报告的人！",
+    "reportsLabel": "份报告",
+    "locationsLabel": "个位置",
+    "howItWorksHeading": "徽章系统如何运作",
+    "howItWorksIntro": "通过贡献社区支持的危机报告获得徽章。徽章奖励独特、有价值的贡献——而不是在同一位置重复提交。",
+    "howItWorksFooter": "徽章按别名（您的姓名）跟踪，以便您可以在各报告中获得认可。始终欢迎匿名提交，同样受到重视。",
+    "stats": {
+      "totalReports": "报告总数",
+      "totalReporters": "报告者总数",
+      "areasCovered": "覆盖区域",
+      "crisisTypes": "已报告的危机类型"
+    }
   },
   "loading": "正在加载报告..."
 }

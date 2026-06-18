@@ -1,18 +1,21 @@
 import { useState, useEffect, useMemo } from 'react';
-import { AlertCircle, Map, Upload, Download, Shield } from 'lucide-react';
+import { AlertCircle, Map, Upload, Download, Shield, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import './i18n';
+import type { ReportConfirmation } from './types/database';
 
 const rtlLanguages = ['ar'];
 import { supabase } from './lib/supabase';
 import type { CrisisSubmission } from './types/database';
+import { getVerifiedSubmissionIds } from './utils/badges';
 import SubmissionForm from './components/SubmissionForm';
 import MapView from './components/MapView';
 import SubmissionDetail from './components/SubmissionDetail';
 import ExportPanel from './components/ExportPanel';
 import LanguageSelector from './components/LanguageSelector';
+import CommunityView from './components/CommunityView';
 
-type Tab = 'submit' | 'map' | 'export';
+type Tab = 'submit' | 'map' | 'community' | 'export';
 
 const PROXIMITY_THRESHOLD = 0.0001; // ~10 meters
 
@@ -51,10 +54,20 @@ function App() {
   const { t, i18n } = useTranslation();
   const [activeTab, setActiveTab] = useState<Tab>('submit');
   const [submissions, setSubmissions] = useState<CrisisSubmission[]>([]);
+  const [confirmations, setConfirmations] = useState<ReportConfirmation[]>([]);
   const [selectedSubmission, setSelectedSubmission] = useState<CrisisSubmission | null>(null);
   const [loading, setLoading] = useState(true);
 
   const latestSubmissions = useMemo(() => getLatestSubmissions(submissions), [submissions]);
+
+  const verifiedSubmissionIds = useMemo(
+    () =>
+      getVerifiedSubmissionIds(
+        confirmations.map((c) => ({ submission_id: c.submission_id, confirmed_by: c.confirmed_by })),
+        submissions
+      ),
+    [confirmations, submissions]
+  );
 
   useEffect(() => {
     const isRtl = rtlLanguages.includes(i18n.language);
@@ -78,8 +91,23 @@ function App() {
     }
   };
 
+  const loadConfirmations = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('report_confirmations')
+        .select('id, submission_id, confirmed_by, created_at')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setConfirmations(data || []);
+    } catch (error) {
+      console.error('Error loading confirmations:', error);
+    }
+  };
+
   useEffect(() => {
     loadSubmissions();
+    loadConfirmations();
 
     const channel = supabase
       .channel('crisis_submissions_changes')
@@ -96,14 +124,31 @@ function App() {
       )
       .subscribe();
 
+    const confirmationChannel = supabase
+      .channel('report_confirmations_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'report_confirmations',
+        },
+        () => {
+          loadConfirmations();
+        }
+      )
+      .subscribe();
+
     return () => {
       supabase.removeChannel(channel);
+      supabase.removeChannel(confirmationChannel);
     };
   }, []);
 
   const tabs = [
     { id: 'submit' as Tab, label: t('nav.submit'), icon: Upload },
     { id: 'map' as Tab, label: t('nav.map'), icon: Map },
+    { id: 'community' as Tab, label: t('nav.community'), icon: Users },
     { id: 'export' as Tab, label: t('nav.export'), icon: Download },
   ];
 
@@ -132,12 +177,12 @@ function App() {
 
       <nav className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex gap-1">
+          <div className="flex gap-1 overflow-x-auto">
             {tabs.map(({ id, label, icon: Icon }) => (
               <button
                 key={id}
                 onClick={() => setActiveTab(id)}
-                className={`flex items-center gap-2 px-6 py-4 font-semibold transition border-b-2 ${
+                className={`flex items-center gap-2 px-6 py-4 font-semibold transition border-b-2 whitespace-nowrap ${
                   activeTab === id
                     ? 'border-blue-600 text-blue-600 bg-blue-50'
                     : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'
@@ -172,7 +217,11 @@ function App() {
                     </p>
                   </div>
                 </div>
-                <SubmissionForm onSubmitSuccess={loadSubmissions} />
+                <SubmissionForm
+                  onSubmitSuccess={loadSubmissions}
+                  allSubmissions={submissions}
+                  verifiedSubmissionIds={verifiedSubmissionIds}
+                />
               </div>
             )}
 
@@ -184,6 +233,13 @@ function App() {
                   onSelectSubmission={setSelectedSubmission}
                 />
               </div>
+            )}
+
+            {activeTab === 'community' && (
+              <CommunityView
+                submissions={submissions}
+                verifiedSubmissionIds={verifiedSubmissionIds}
+              />
             )}
 
             {activeTab === 'export' && (

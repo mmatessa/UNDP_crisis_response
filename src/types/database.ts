@@ -37,6 +37,13 @@ export interface CrisisSubmission {
   created_at: string;
 }
 
+export interface ReportConfirmation {
+  id: string;
+  submission_id: string;
+  confirmed_by: string | null;
+  created_at: string;
+}
+
 export interface Database {
   public: {
     Tables: {
@@ -44,6 +51,11 @@ export interface Database {
         Row: CrisisSubmission;
         Insert: Omit<CrisisSubmission, 'id' | 'created_at'>;
         Update: Partial<Omit<CrisisSubmission, 'id' | 'created_at'>>;
+      };
+      report_confirmations: {
+        Row: ReportConfirmation;
+        Insert: Omit<ReportConfirmation, 'id' | 'created_at'>;
+        Update: Partial<Omit<ReportConfirmation, 'id' | 'created_at'>>;
       };
     };
   };

@@ -8,6 +8,7 @@
   "nav": {
     "submit": "Enviar Informe",
     "map": "Ver Mapa",
+    "community": "Comunidad",
     "export": "Exportar Datos"
   },
   "submit": {
@@ -70,8 +71,9 @@
     "latitude": "Latitud",
     "longitude": "Longitud",
     "locationName": "Nombre del lugar (opcional)",
-    "contactLabel": "Tu Contacto (Opcional)",
-    "contactPlaceholder": "Nombre o número de teléfono",
+    "contactLabel": "Tu nombre o alias (opcional)",
+    "contactPlaceholder": "Nombre o alias",
+    "aliasBadgeHelp": "Proporciona un nombre o alias para ganar insignias y aparecer en la tabla de clasificación comunitaria. Las envíos anónimos son bienvenidos y igualmente valorados.",
     "submitReport": "Enviar Informe",
     "submitting": "Enviando...",
     "successMessage": "¡Envío exitoso! Gracias por tu informe.",
@@ -91,6 +93,7 @@
     "currentCoordinates": "Coordenadas Actuales",
     "osmId": "ID OSM",
     "zoomNotice": "Amplía al nivel 15+ para ver los contornos de edificios",
+    "duplicateLocationNotice": "Parece que esta ubicación ya ha sido reportada. ¡Tu actualización ayuda a mantener la información actualizada!",
     "buildingError": {
       "zoom_too_low": "Amplía para ver los contornos de edificios",
       "rate_limited": "Demasiadas solicitudes. Espera e intenta de nuevo.",
@@ -102,6 +105,8 @@
     "legendTitle": "Leyenda de Daños",
     "reports": "informe",
     "reports_plural": "informes",
+    "locations": "ubicación",
+    "locations_plural": "ubicaciones",
     "damage": "DAÑO",
     "clickToSelectBuilding": "Haz clic para seleccionar este edificio",
     "selectedBuilding": "Edificio Seleccionado",
@@ -126,7 +131,18 @@
     "infrastructureCategory": "Categoría de Infraestructura",
     "infrastructureName": "Nombre de la Infraestructura",
     "crisisNature": "Naturaleza de la Crisis",
-    "debrisClearance": "Limpieza de Escombros Requerida"
+    "debrisClearance": "Limpieza de Escombros Requerida",
+    "versionHistory": "Historial de versiones",
+    "latestReport": "Último informe",
+    "previousReport": "Informe anterior",
+    "report": "informe",
+    "reports": "informes",
+    "verifyReport": "Verificar este informe",
+    "verifyReportHelp": "Confirmar este informe ayuda al colaborador a obtener la insignia Testigo Verificado. Las confirmaciones anónimas son bienvenidas.",
+    "confirmReport": "Confirmar informe",
+    "reportConfirmed": "Informe confirmado",
+    "confirmError": "No se pudo confirmar el informe. Intenta de nuevo.",
+    "contributorBadges": "Insignias obtenidas por {{name}}"
   },
   "export": {
     "title": "Exportar Datos",
@@ -142,6 +158,57 @@
     "partialDamage": "Daño Parcial",
     "destroyed": "Destruido",
     "noData": "Sin datos para exportar"
+  },
+  "badges": {
+    "earned": "Obtenida",
+    "progress": "{{current}}/{{threshold}}",
+    "firstResponder": {
+      "name": "Primer Respondiente",
+      "description": "Envió su primer informe"
+    },
+    "communityGuardian": {
+      "name": "Guardián Comunitario",
+      "description": "Envió informes desde 5 ubicaciones diferentes"
+    },
+    "crisisMapper": {
+      "name": "Mapeador de Crisis",
+      "description": "Reportó 3 tipos diferentes de crisis"
+    },
+    "verifiedWitness": {
+      "name": "Testigo Verificado",
+      "description": "Tuvo un informe confirmado por otro usuario"
+    },
+    "rapidResponder": {
+      "name": "Respondiente Rápido",
+      "description": "Envió un informe dentro de 1 hora de un evento de crisis"
+    },
+    "modal": {
+      "title": "¡Informe enviado!",
+      "greetingNamed": "Gracias, {{name}}, por ayudar a tu comunidad.",
+      "greetingAnonymous": "Gracias por ayudar a tu comunidad.",
+      "earnedHeading": "Insignias que has obtenido",
+      "noNewBadges": "Tu contribución ha sido registrada. Sigue reportando para ganar insignias.",
+      "nextBadgeIntro": "Estás progresando hacia la próxima insignia:",
+      "continue": "Continuar reportando"
+    }
+  },
+  "community": {
+    "anonymous": "Anónimo",
+    "anonymousNote": "Las envíos anónimos son bienvenidos y igualmente valorados. Las insignias se obtienen por alias, pero contribuir sin uno tiene el mismo impacto.",
+    "statsHeading": "Estadísticas Comunitarias",
+    "leaderboardHeading": "Mejores Colaboradores",
+    "noContributors": "Aún no hay colaboradores. ¡Sé el primero en enviar un informe!",
+    "reportsLabel": "informes",
+    "locationsLabel": "ubicaciones",
+    "howItWorksHeading": "Cómo funciona el sistema de insignias",
+    "howItWorksIntro": "Gana insignias contribuyendo con informes de crisis impulsados por la comunidad. Las insignias recompensan contribuciones únicas y valiosas - no envíos repetidos en el mismo lugar.",
+    "howItWorksFooter": "Las insignias se rastrean por alias (tu nombre) para que puedas obtener reconocimiento entre informes. Las envíos anónimos siempre son bienvenidos y igualmente valorados.",
+    "stats": {
+      "totalReports": "Total de informes",
+      "totalReporters": "Total de reporteros",
+      "areasCovered": "Áreas cubiertas",
+      "crisisTypes": "Tipos de crisis reportados"
+    }
   },
   "loading": "Cargando informes..."
 }

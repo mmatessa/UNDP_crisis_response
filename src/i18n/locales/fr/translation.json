@@ -8,6 +8,7 @@
   "nav": {
     "submit": "Soumettre un Rapport",
     "map": "Voir la Carte",
+    "community": "Communauté",
     "export": "Exporter les Données"
   },
   "submit": {
@@ -70,8 +71,9 @@
     "latitude": "Latitude",
     "longitude": "Longitude",
     "locationName": "Nom du lieu (optionnel)",
-    "contactLabel": "Vos Coordonnées (Optionnel)",
-    "contactPlaceholder": "Nom ou numéro de téléphone",
+    "contactLabel": "Votre nom ou pseudo (optionnel)",
+    "contactPlaceholder": "Nom ou pseudo",
+    "aliasBadgeHelp": "Fournissez un nom ou pseudo pour gagner des badges et figurer sur le classement communautaire. Les soumissions anonymes sont les bienvenues et tout aussi précieuses.",
     "submitReport": "Soumettre le Rapport",
     "submitting": "Soumission...",
     "successMessage": "Soumission réussie ! Merci pour votre rapport.",
@@ -91,6 +93,7 @@
     "currentCoordinates": "Coordonnées Actuelles",
     "osmId": "ID OSM",
     "zoomNotice": "Zoomez au niveau 15+ pour voir les empreintes des bâtiments",
+    "duplicateLocationNotice": "Il semble que cet emplacement ait déjà été signalé. Votre mise à jour aide à garder les informations à jour !",
     "buildingError": {
       "zoom_too_low": "Zoomez pour voir les empreintes des bâtiments",
       "rate_limited": "Trop de requêtes. Veuillez patienter et réessayer.",
@@ -102,6 +105,8 @@
     "legendTitle": "Légende des Dommages",
     "reports": "Rapport",
     "reports_plural": "Rapports",
+    "locations": "Localisation",
+    "locations_plural": "Localisations",
     "damage": "DOMMAGES",
     "clickToSelectBuilding": "Cliquez pour sélectionner ce bâtiment",
     "selectedBuilding": "Bâtiment Sélectionné",
@@ -126,7 +131,18 @@
     "infrastructureCategory": "Catégorie d'Infrastructure",
     "infrastructureName": "Nom de l'Infrastructure",
     "crisisNature": "Nature de la Crise",
-    "debrisClearance": "Dégagement des Débris Requis"
+    "debrisClearance": "Dégagement des Débris Requis",
+    "versionHistory": "Historique des versions",
+    "latestReport": "Dernier rapport",
+    "previousReport": "Rapport précédent",
+    "report": "rapport",
+    "reports": "rapports",
+    "verifyReport": "Vérifier ce rapport",
+    "verifyReportHelp": "Confirmer ce rapport aide le contributeur à obtenir le badge Témoin Vérifié. Les confirmations anonymes sont les bienvenues.",
+    "confirmReport": "Confirmer le rapport",
+    "reportConfirmed": "Rapport confirmé",
+    "confirmError": "Impossible de confirmer le rapport. Veuillez réessayer.",
+    "contributorBadges": "Badges obtenus par {{name}}"
   },
   "export": {
     "title": "Exporter les Données",
@@ -142,6 +158,57 @@
     "partialDamage": "Dommages Partiels",
     "destroyed": "Détruit",
     "noData": "Aucune donnée à exporter"
+  },
+  "badges": {
+    "earned": "Obtenu",
+    "progress": "{{current}}/{{threshold}}",
+    "firstResponder": {
+      "name": "Premier Intervenant",
+      "description": "A soumis son premier rapport"
+    },
+    "communityGuardian": {
+      "name": "Gardien Communautaire",
+      "description": "A soumis des rapports depuis 5 lieux différents"
+    },
+    "crisisMapper": {
+      "name": "Cartographe de Crise",
+      "description": "A signalé 3 types de crise différents"
+    },
+    "verifiedWitness": {
+      "name": "Témoin Vérifié",
+      "description": "A eu un rapport confirmé par un autre utilisateur"
+    },
+    "rapidResponder": {
+      "name": "Intervenant Rapide",
+      "description": "A soumis un rapport moins d'une heure après un événement de crise"
+    },
+    "modal": {
+      "title": "Rapport soumis !",
+      "greetingNamed": "Merci, {{name}}, d'aider votre communauté.",
+      "greetingAnonymous": "Merci d'aider votre communauté.",
+      "earnedHeading": "Badges que vous avez obtenus",
+      "noNewBadges": "Votre contribution a été enregistrée. Continuez à signaler pour gagner des badges.",
+      "nextBadgeIntro": "Vous progressez vers le prochain badge :",
+      "continue": "Continuer à signaler"
+    }
+  },
+  "community": {
+    "anonymous": "Anonyme",
+    "anonymousNote": "Les soumissions anonymes sont les bienvenues et tout aussi précieuses. Les badges sont obtenus par pseudo, mais contribuer sans pseudo a le même impact.",
+    "statsHeading": "Statistiques Communautaires",
+    "leaderboardHeading": "Meilleurs Contributeurs",
+    "noContributors": "Aucun contributeur pour le moment. Soyez le premier à soumettre un rapport !",
+    "reportsLabel": "rapports",
+    "locationsLabel": "lieux",
+    "howItWorksHeading": "Comment fonctionne le système de badges",
+    "howItWorksIntro": "Gagnez des badges en contribuant à des rapports de crise portés par la communauté. Les badges récompensent des contributions uniques et précieuses - et non des soumissions répétées au même endroit.",
+    "howItWorksFooter": "Les badges sont suivis par pseudo (votre nom) afin que vous puissiez obtenir une reconnaissance entre les rapports. Les soumissions anonymes sont toujours les bienvenues et tout aussi précieuses.",
+    "stats": {
+      "totalReports": "Total des rapports",
+      "totalReporters": "Total des rapporteurs",
+      "areasCovered": "Zones couvertes",
+      "crisisTypes": "Types de crise signalés"
+    }
   },
   "loading": "Chargement des soumissions..."
 }

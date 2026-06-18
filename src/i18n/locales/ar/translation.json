@@ -8,6 +8,7 @@
   "nav": {
     "submit": "إرسال تقرير",
     "map": "عرض الخريطة",
+    "community": "المجتمع",
     "export": "تصدير البيانات"
   },
   "submit": {
@@ -70,8 +71,9 @@
     "latitude": "خط العرض",
     "longitude": "خط الطول",
     "locationName": "اسم الموقع (اختياري)",
-    "contactLabel": "جهة الاتصال (اختياري)",
-    "contactPlaceholder": "الاسم أو رقم الهاتف",
+    "contactLabel": "اسمك أو اسمك المستعار (اختياري)",
+    "contactPlaceholder": "الاسم أو الاسم المستعار",
+    "aliasBadgeHelp": "قدم اسمًا أو اسمًا مستعارًا لكسب الشارات والظهور على لوحة المتصدرين. التقريرات المجهولة مرحب بها ومقدرة بنفس القدر.",
     "submitReport": "إرسال التقرير",
     "submitting": "جاري الإرسال...",
     "successMessage": "تم الإرسال بنجاح! شكراً لتقريرك.",
@@ -91,6 +93,7 @@
     "currentCoordinates": "الإحداثيات الحالية",
     "osmId": "معرف OSM",
     "zoomNotice": "قم بالتكبير إلى مستوى 15+ لرؤية بصمات المباني",
+    "duplicateLocationNotice": "يبدو أن هذا الموقع قد تم الإبلاغ عنه بالفعل. تحديثك يساعد في إبقاء المعلومات محدثة!",
     "buildingError": {
       "zoom_too_low": "قم بالتكبير لرؤية بصمات المباني",
       "rate_limited": "طلبات كثيرة. يرجى الانتظار والمحاولة مرة أخرى.",
@@ -102,6 +105,8 @@
     "legendTitle": "مفتاح الضرر",
     "reports": "تقرير",
     "reports_plural": "تقارير",
+    "locations": "موقع",
+    "locations_plural": "مواقع",
     "damage": "ضرر",
     "clickToSelectBuilding": "انقر لاختيار هذا المبنى",
     "selectedBuilding": "المبنى المختار",
@@ -126,7 +131,18 @@
     "infrastructureCategory": "فئة البنية التحتية",
     "infrastructureName": "اسم البنية التحتية",
     "crisisNature": "طبيعة الأزمة",
-    "debrisClearance": "إزالة الحطام مطلوبة"
+    "debrisClearance": "إزالة الحطام مطلوبة",
+    "versionHistory": "سجل الإصدارات",
+    "latestReport": "أحدث تقرير",
+    "previousReport": "التقرير السابق",
+    "report": "تقرير",
+    "reports": "تقارير",
+    "verifyReport": "تحقق من هذا التقرير",
+    "verifyReportHelp": "تأكيد هذا التقرير يساهم في حصول المساهم على شارة الشاهد الموثق. التأكيدات المجهولة مرحب بها.",
+    "confirmReport": "تأكيد التقرير",
+    "reportConfirmed": "تم تأكيد التقرير",
+    "confirmError": "تعذر تأكيد التقرير. يرجى المحاولة مرة أخرى.",
+    "contributorBadges": "الشارات التي حصل عليها {{name}}"
   },
   "export": {
     "title": "تصدير البيانات",
@@ -142,6 +158,57 @@
     "partialDamage": "ضرر جزئي",
     "destroyed": "مدمر",
     "noData": "لا توجد بيانات للتصدير"
+  },
+  "badges": {
+    "earned": "تم الحصول عليها",
+    "progress": "{{current}}/{{threshold}}",
+    "firstResponder": {
+      "name": "المستجيب الأول",
+      "description": "أرسل تقريره الأول"
+    },
+    "communityGuardian": {
+      "name": "حارس المجتمع",
+      "description": "أرسل تقارير من 5 مواقع مختلفة"
+    },
+    "crisisMapper": {
+      "name": "مخطط الأزمات",
+      "description": "أبلغ عن 3 أنواع مختلفة من الأزمات"
+    },
+    "verifiedWitness": {
+      "name": "شاهد موثق",
+      "description": "تم تأكيد تقريره من قبل مستخدم آخر"
+    },
+    "rapidResponder": {
+      "name": "المستجيب السريع",
+      "description": "أرسل تقريراً خلال ساعة واحدة من حدوث الأزمة"
+    },
+    "modal": {
+      "title": "تم إرسال التقرير!",
+      "greetingNamed": "شكراً لك يا {{name}} على مساعدة مجتمعك.",
+      "greetingAnonymous": "شكراً لك على مساعدة مجتمعك.",
+      "earnedHeading": "الشارات التي حصلت عليها",
+      "noNewBadges": "تم تسجيل مساهمتك. استمر في الإبلاغ لكسب الشارات.",
+      "nextBadgeIntro": "أنت تحرز تقدماً نحو الشارة التالية:",
+      "continue": "متابعة الإبلاغ"
+    }
+  },
+  "community": {
+    "anonymous": "مجهول",
+    "anonymousNote": "التقريرات المجهولة مرحب بها ومقدرة بنفس القدر. يتم كسب الشارات بالاسم المستعار، لكن المساهمة بدون اسم لها نفس الأثر.",
+    "statsHeading": "إحصائيات المجتمع",
+    "leaderboardHeading": "كبار المساهمين",
+    "noContributors": "لا يوجد مساهمون بعد. كن أول من يرسل تقريراً!",
+    "reportsLabel": "تقارير",
+    "locationsLabel": "مواقع",
+    "howItWorksHeading": "كيف يعمل نظام الشارات",
+    "howItWorksIntro": "اكسب الشارات من خلال المساهمة بتقارير الأزمات بدعم من المجتمع. تكافئ الشارات المساهمات الفريدة والقيمة - وليس التقريرات المتكررة في نفس الموقع.",
+    "howItWorksFooter": "يتم تتبع الشارات بالاسم المستعار (اسمك) لتتمكن من كسب التقدير عبر التقريرات. التقريرات المجهولة مرحب بها دائماً ومقدرة بنفس القدر.",
+    "stats": {
+      "totalReports": "إجمالي التقريرات",
+      "totalReporters": "إجمالي المبلغين",
+      "areasCovered": "المناطق المغطاة",
+      "crisisTypes": "أنواع الأزمات المبلغ عنها"
+    }
   },
   "loading": "جاري تحميل التقارير..."
 }

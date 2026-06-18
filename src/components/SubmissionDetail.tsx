@@ -1,6 +1,10 @@
-import { X, MapPin, Calendar, User, Building, AlertTriangle, Trash2, History } from 'lucide-react';
+import { useState } from 'react';
+import { X, MapPin, Calendar, User, Building, AlertTriangle, Trash2, History, CheckCircle, Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { CrisisSubmission } from '../types/database';
+import { BadgeSystem } from './BadgeSystem';
+import { supabase } from '../lib/supabase';
+import { computeBadgeStats, computeBadgeProgress } from '../utils/badges';
 
 interface SubmissionDetailProps {
   submission: CrisisSubmission;
@@ -25,6 +29,9 @@ function getRelatedSubmissions(submission: CrisisSubmission, allSubmissions: Cri
 
 export default function SubmissionDetail({ submission, allSubmissions, onClose }: SubmissionDetailProps) {
   const { t, i18n } = useTranslation();
+  const [confirming, setConfirming] = useState(false);
+  const [confirmError, setConfirmError] = useState<string | null>(null);
+  const [confirmed, setConfirmed] = useState(false);
 
   const getDamageBadgeClass = (level: string) => {
     switch (level) {
@@ -80,8 +87,31 @@ export default function SubmissionDetail({ submission, allSubmissions, onClose }
 
   const relatedSubmissions = allSubmissions ? getRelatedSubmissions(submission, allSubmissions) : [submission];
   const hasVersionHistory = relatedSubmissions.length > 1;
-  const currentSubmissionIndex = relatedSubmissions.findIndex((s) => s.id === submission.id);
-  const isLatest = currentSubmissionIndex === 0;
+
+  // Contributor badge progress (the submitter's own badge progress)
+  const submitterSubs = (allSubmissions ?? []).filter(
+    (s) => (s.submitted_by ?? '').trim().toLowerCase() === (submission.submitted_by ?? '').trim().toLowerCase()
+  );
+  const stats = computeBadgeStats(submitterSubs, new Set<string>());
+  const progress = computeBadgeProgress(stats);
+
+  const handleConfirmReport = async () => {
+    setConfirming(true);
+    setConfirmError(null);
+    try {
+      const { error } = await supabase.from('report_confirmations').insert({
+        submission_id: submission.id,
+        confirmed_by: null,
+      });
+      if (error) throw error;
+      setConfirmed(true);
+    } catch (err) {
+      console.error('Error confirming report:', err);
+      setConfirmError(t('detail.confirmError'));
+    } finally {
+      setConfirming(false);
+    }
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[9999]">
@@ -153,6 +183,44 @@ export default function SubmissionDetail({ submission, allSubmissions, onClose }
               </div>
             </div>
           </div>
+
+          {/* Verify this report (contributes to submitter's Verified Witness badge) */}
+          <div className="flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+            <CheckCircle className="text-amber-600 flex-shrink-0 mt-1" size={20} />
+            <div className="flex-1">
+              <div className="font-semibold text-gray-900 mb-1">{t('detail.verifyReport')}</div>
+              <p className="text-sm text-gray-600 mb-3">{t('detail.verifyReportHelp')}</p>
+              {confirmError && (
+                <p className="text-sm text-red-600 mb-2">{confirmError}</p>
+              )}
+              <button
+                type="button"
+                onClick={handleConfirmReport}
+                disabled={confirming || confirmed}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-lg font-medium hover:bg-amber-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {confirming ? (
+                  <Loader2 size={16} className="animate-spin" />
+                ) : (
+                  <CheckCircle size={16} />
+                )}
+                <span>{confirmed ? t('detail.reportConfirmed') : t('detail.confirmReport')}</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Contributor Badges */}
+          {submission.submitted_by && submitterSubs.length > 0 && (
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <User className="text-blue-600" size={20} />
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {t('detail.contributorBadges', { name: submission.submitted_by })}
+                </h3>
+              </div>
+              <BadgeSystem badgeProgress={progress} variant="compact" />
+            </div>
+          )}
 
           <div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('detail.description')}</h3>

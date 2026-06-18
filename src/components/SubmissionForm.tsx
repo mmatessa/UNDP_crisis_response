@@ -1,15 +1,20 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { Camera, MapPin, Loader2, X, Building } from 'lucide-react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { Camera, MapPin, Loader2, X, Building, Info } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { supabase } from '../lib/supabase';
-import type { DamageLevel, CrisisNature, InfrastructureType } from '../types/database';
+import type { DamageLevel, CrisisNature, InfrastructureType, CrisisSubmission } from '../types/database';
 import type { BuildingFootprint } from '../services/buildingFootprints';
 import { fetchBuildingFootprints, MIN_ZOOM } from '../services/buildingFootprints';
+import { isDuplicateLocation, computeBadgeStats, computeBadgeProgress } from '../utils/badges';
+import type { BadgeProgress } from '../utils/badges';
+import { CongratulationsModal } from './BadgeSystem';
 
 interface SubmissionFormProps {
   onSubmitSuccess: () => void;
+  allSubmissions?: CrisisSubmission[];
+  verifiedSubmissionIds?: Set<string>;
 }
 
 function BuildingSelectionMap({
@@ -77,6 +82,7 @@ function BuildingSelectionMap({
         map.current = null;
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -173,6 +179,7 @@ function BuildingSelectionMap({
     if (map.current) {
       fetchBuildings();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [map.current, zoom, fetchBuildings]);
 
   useEffect(() => {
@@ -277,7 +284,11 @@ function BuildingSelectionMap({
   );
 }
 
-export default function SubmissionForm({ onSubmitSuccess }: SubmissionFormProps) {
+export default function SubmissionForm({
+  onSubmitSuccess,
+  allSubmissions = [],
+  verifiedSubmissionIds,
+}: SubmissionFormProps) {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
@@ -294,6 +305,16 @@ export default function SubmissionForm({ onSubmitSuccess }: SubmissionFormProps)
   const [coordinates, setCoordinates] = useState<{ lat: number; lng: number } | null>(null);
   const [gettingLocation, setGettingLocation] = useState(false);
   const [selectedBuilding, setSelectedBuilding] = useState<BuildingFootprint | null>(null);
+  const [showCongratulations, setShowCongratulations] = useState(false);
+  const [earnedBatchProgress, setEarnedBatchProgress] = useState<BadgeProgress[]>([]);
+
+  const isDuplicate = useMemo(() => {
+    if (!coordinates) return false;
+    return isDuplicateLocation(
+      { latitude: coordinates.lat, longitude: coordinates.lng },
+      allSubmissions
+    );
+  }, [coordinates, allSubmissions]);
 
   const infrastructureTypes: InfrastructureType[] = [
     'residential_infrastructure',
@@ -346,6 +367,7 @@ export default function SubmissionForm({ onSubmitSuccess }: SubmissionFormProps)
 
   useEffect(() => {
     getCurrentLocation();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleBuildingSelect = useCallback((building: BuildingFootprint | null) => {
@@ -446,6 +468,7 @@ export default function SubmissionForm({ onSubmitSuccess }: SubmissionFormProps)
     try {
       const photoUrl = await uploadPhoto(photoFile);
 
+      const alias = submittedBy.trim();
       const { error } = await supabase.from('crisis_submissions').insert({
         photo_url: photoUrl,
         description,
@@ -458,12 +481,41 @@ export default function SubmissionForm({ onSubmitSuccess }: SubmissionFormProps)
         latitude: coordinates.lat,
         longitude: coordinates.lng,
         location_name: locationName || null,
-        submitted_by: submittedBy || null,
+        submitted_by: alias || null,
       });
 
       if (error) throw error;
 
-      alert(t('submit.successMessage'));
+      // Build updated submission list (including the just-submitted one) so the
+      // congratulations modal can compute current badge progress accurately.
+      const justSubmitted: CrisisSubmission = {
+        id: 'pending-' + Date.now(),
+        photo_url: photoUrl,
+        description,
+        damage_level: damageLevel,
+        infrastructure_type:
+          infrastructureType === 'other'
+            ? `other: ${otherInfrastructureType}`
+            : infrastructureType,
+        infrastructure_name: infrastructureName || null,
+        crisis_nature: crisisNature,
+        debris_clearance_required: debrisClearanceRequired,
+        latitude: coordinates.lat,
+        longitude: coordinates.lng,
+        location_name: locationName || null,
+        submitted_by: alias || null,
+        created_at: new Date().toISOString(),
+      };
+
+      const updatedList = alias
+        ? filterByContributor([...allSubmissions, justSubmitted], alias)
+        : [justSubmitted];
+
+      const verifiedIds = verifiedSubmissionIds ?? new Set<string>();
+      const stats = computeBadgeStats(updatedList, verifiedIds);
+      const progress = computeBadgeProgress(stats);
+      setEarnedBatchProgress(progress);
+      setShowCongratulations(true);
 
       setPhotoFile(null);
       setPhotoPreview('');
@@ -488,303 +540,329 @@ export default function SubmissionForm({ onSubmitSuccess }: SubmissionFormProps)
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded-lg shadow-lg">
-      <h2 className="text-2xl font-bold text-gray-900">{t('submit.title')}</h2>
+    <>
+      <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded-lg shadow-lg">
+        <h2 className="text-2xl font-bold text-gray-900">{t('submit.title')}</h2>
 
-      {/* Photo Upload */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {t('submit.photoLabel')} <span className="text-red-500">*</span>
-        </label>
-        <div className="flex items-center gap-4">
-          <label className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg cursor-pointer hover:bg-blue-700 transition">
-            <Camera size={20} />
-            <span>{t('submit.uploadPhoto')}</span>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handlePhotoChange}
-              className="hidden"
-              required
-            />
+        {/* Photo Upload */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            {t('submit.photoLabel')} <span className="text-red-500">*</span>
           </label>
-        </div>
-        {photoPreview && (
-          <img src={photoPreview} alt="Preview" className="mt-4 max-w-full h-48 object-cover rounded-lg" />
-        )}
-      </div>
-
-      {/* Building / Location Selection */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {t('submit.buildingLocationLabel')} <span className="text-red-500">*</span>
-        </label>
-        <p className="text-xs text-gray-500 mb-3">{t('submit.buildingLocationHelp')}</p>
-        <BuildingSelectionMap
-          selectedBuilding={selectedBuilding}
-          onSelectBuilding={handleBuildingSelect}
-          coordinates={coordinates}
-        />
-
-        {/* GPS Fallback */}
-        <div className="mt-3 flex items-center gap-2">
-          <button
-            type="button"
-            onClick={getCurrentLocation}
-            disabled={gettingLocation}
-            className="flex items-center gap-2 px-3 py-1.5 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition disabled:opacity-50"
-          >
-            {gettingLocation ? (
-              <Loader2 size={16} className="animate-spin" />
-            ) : (
-              <MapPin size={16} />
-            )}
-            <span>{gettingLocation ? t('submit.gettingLocation') : t('submit.useGPS')}</span>
-          </button>
-
-          {selectedBuilding && (
-            <button
-              type="button"
-              onClick={() => {
-                setSelectedBuilding(null);
-                if (coordinates) {
-                  getCurrentLocation();
-                }
-              }}
-              className="flex items-center gap-1 px-3 py-1.5 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200 transition"
-            >
-              <X size={14} />
-              <span>{t('submit.clearBuilding')}</span>
-            </button>
+          <div className="flex items-center gap-4">
+            <label className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg cursor-pointer hover:bg-blue-700 transition">
+              <Camera size={20} />
+              <span>{t('submit.uploadPhoto')}</span>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handlePhotoChange}
+                className="hidden"
+                required
+              />
+            </label>
+          </div>
+          {photoPreview && (
+            <img src={photoPreview} alt="Preview" className="mt-4 max-w-full h-48 object-cover rounded-lg" />
           )}
         </div>
 
-        {/* Coordinates display */}
-        {coordinates && (
-          <div className="mt-3 text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
-            <div className="flex items-center gap-2 mb-1">
-              <Building size={14} className="text-blue-600" />
-              <span className="font-medium">{t('submit.currentCoordinates')}</span>
+        {/* Building / Location Selection */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            {t('submit.buildingLocationLabel')} <span className="text-red-500">*</span>
+          </label>
+          <p className="text-xs text-gray-500 mb-3">{t('submit.buildingLocationHelp')}</p>
+          <BuildingSelectionMap
+            selectedBuilding={selectedBuilding}
+            onSelectBuilding={handleBuildingSelect}
+            coordinates={coordinates}
+          />
+
+          {/* Duplicate location notice */}
+          {isDuplicate && (
+            <div className="mt-3 bg-blue-50 border border-blue-200 rounded-lg p-3 flex gap-2">
+              <Info className="text-blue-600 flex-shrink-0 mt-0.5" size={16} />
+              <p className="text-sm text-blue-900">{t('submit.duplicateLocationNotice')}</p>
             </div>
-            <p>
-              {t('submit.latitude')}: {coordinates.lat.toFixed(6)}, {t('submit.longitude')}:{' '}
-              {coordinates.lng.toFixed(6)}
-            </p>
+          )}
+
+          {/* GPS Fallback */}
+          <div className="mt-3 flex items-center gap-2">
+            <button
+              type="button"
+              onClick={getCurrentLocation}
+              disabled={gettingLocation}
+              className="flex items-center gap-2 px-3 py-1.5 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition disabled:opacity-50"
+            >
+              {gettingLocation ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : (
+                <MapPin size={16} />
+              )}
+              <span>{gettingLocation ? t('submit.gettingLocation') : t('submit.useGPS')}</span>
+            </button>
+
             {selectedBuilding && (
-              <p className="text-xs text-blue-600 mt-1">
-                {t('submit.osmId')}: {selectedBuilding.osmId}
-              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedBuilding(null);
+                  if (coordinates) {
+                    getCurrentLocation();
+                  }
+                }}
+                className="flex items-center gap-1 px-3 py-1.5 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200 transition"
+              >
+                <X size={14} />
+                <span>{t('submit.clearBuilding')}</span>
+              </button>
             )}
           </div>
-        )}
 
-        {/* Location name input */}
-        <input
-          type="text"
-          value={locationName}
-          onChange={(e) => setLocationName(e.target.value)}
-          className="mt-3 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder={t('submit.locationName')}
-        />
-      </div>
+          {/* Coordinates display */}
+          {coordinates && (
+            <div className="mt-3 text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
+              <div className="flex items-center gap-2 mb-1">
+                <Building size={14} className="text-blue-600" />
+                <span className="font-medium">{t('submit.currentCoordinates')}</span>
+              </div>
+              <p>
+                {t('submit.latitude')}: {coordinates.lat.toFixed(6)}, {t('submit.longitude')}:{' '}
+                {coordinates.lng.toFixed(6)}
+              </p>
+              {selectedBuilding && (
+                <p className="text-xs text-blue-600 mt-1">
+                  {t('submit.osmId')}: {selectedBuilding.osmId}
+                </p>
+              )}
+            </div>
+          )}
 
-      {/* Infrastructure Type */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {t('submit.infrastructureType')} <span className="text-red-500">*</span>
-        </label>
-        <select
-          value={infrastructureType}
-          onChange={(e) => setInfrastructureType(e.target.value as InfrastructureType)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          required
-        >
-          <option value="">{t('submit.selectType')}</option>
-          {infrastructureTypes.map((type) => (
-            <option key={type} value={type}>
-              {t(`submit.infrastructureTypes.${type}`)}
-            </option>
-          ))}
-        </select>
-        {infrastructureType === 'other' && (
+          {/* Location name input */}
           <input
             type="text"
-            value={otherInfrastructureType}
-            onChange={(e) => setOtherInfrastructureType(e.target.value)}
-            className="mt-2 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder={t('submit.otherInfrastructurePlaceholder')}
-            required
+            value={locationName}
+            onChange={(e) => setLocationName(e.target.value)}
+            className="mt-3 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder={t('submit.locationName')}
           />
-        )}
-      </div>
+        </div>
 
-      {/* Infrastructure Name/Details */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {t('submit.infrastructureNameLabel')}
-        </label>
-        <input
-          type="text"
-          value={infrastructureName}
-          onChange={(e) => setInfrastructureName(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder={t('submit.infrastructureNamePlaceholder')}
-        />
-      </div>
+        {/* Infrastructure Type */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            {t('submit.infrastructureType')} <span className="text-red-500">*</span>
+          </label>
+          <select
+            value={infrastructureType}
+            onChange={(e) => setInfrastructureType(e.target.value as InfrastructureType)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            required
+          >
+            <option value="">{t('submit.selectType')}</option>
+            {infrastructureTypes.map((type) => (
+              <option key={type} value={type}>
+                {t(`submit.infrastructureTypes.${type}`)}
+              </option>
+            ))}
+          </select>
+          {infrastructureType === 'other' && (
+            <input
+              type="text"
+              value={otherInfrastructureType}
+              onChange={(e) => setOtherInfrastructureType(e.target.value)}
+              className="mt-2 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder={t('submit.otherInfrastructurePlaceholder')}
+              required
+            />
+          )}
+        </div>
 
-      {/* Damage Level */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {t('submit.damageLevel')} <span className="text-red-500">*</span>
-        </label>
-        <div className="grid grid-cols-3 gap-3">
-          {(['minimal', 'partial', 'destroyed'] as DamageLevel[]).map((level) => (
+        {/* Infrastructure Name/Details */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            {t('submit.infrastructureNameLabel')}
+          </label>
+          <input
+            type="text"
+            value={infrastructureName}
+            onChange={(e) => setInfrastructureName(e.target.value)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder={t('submit.infrastructureNamePlaceholder')}
+          />
+        </div>
+
+        {/* Damage Level */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            {t('submit.damageLevel')} <span className="text-red-500">*</span>
+          </label>
+          <div className="grid grid-cols-3 gap-3">
+            {(['minimal', 'partial', 'destroyed'] as DamageLevel[]).map((level) => (
+              <button
+                key={level}
+                type="button"
+                onClick={() => setDamageLevel(level)}
+                className={`px-4 py-3 rounded-lg border-2 font-medium transition ${
+                  damageLevel === level
+                    ? level === 'minimal'
+                      ? 'border-yellow-500 bg-yellow-50 text-yellow-900'
+                      : level === 'partial'
+                      ? 'border-orange-500 bg-orange-50 text-orange-900'
+                      : 'border-red-500 bg-red-50 text-red-900'
+                    : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
+                }`}
+              >
+                {t(`submit.damageLevels.${level}`)}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Nature of Crisis */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            {t('submit.crisisNatureLabel')} <span className="text-red-500">*</span>
+          </label>
+          <div className="space-y-4">
+            {crisisNatureOptions.map(({ category, options }) => (
+              <div key={category}>
+                <p className="text-sm font-semibold text-gray-600 mb-2">
+                  {t(`submit.crisisNatureCategory.${category}`)}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {options.map((option) => (
+                    <button
+                      key={option}
+                      type="button"
+                      onClick={() => toggleCrisisNature(option)}
+                      className={`px-3 py-2 rounded-lg border-2 text-sm font-medium transition ${
+                        crisisNature.includes(option)
+                          ? 'border-blue-500 bg-blue-50 text-blue-900'
+                          : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
+                      }`}
+                    >
+                      {t(`submit.crisisNatureOptions.${option}`)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+          {crisisNature.length > 0 && (
+            <div className="mt-3 flex flex-wrap gap-1">
+              {crisisNature.map((nature) => (
+                <span
+                  key={nature}
+                  className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs"
+                >
+                  {t(`submit.crisisNatureOptions.${nature}`)}
+                  <button
+                    type="button"
+                    onClick={() => toggleCrisisNature(nature)}
+                    className="hover:text-blue-600"
+                  >
+                    <X size={12} />
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Debris Clearance Required */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            {t('submit.debrisClearanceLabel')} <span className="text-red-500">*</span>
+          </label>
+          <div className="flex gap-4">
             <button
-              key={level}
               type="button"
-              onClick={() => setDamageLevel(level)}
-              className={`px-4 py-3 rounded-lg border-2 font-medium transition ${
-                damageLevel === level
-                  ? level === 'minimal'
-                    ? 'border-yellow-500 bg-yellow-50 text-yellow-900'
-                    : level === 'partial'
-                    ? 'border-orange-500 bg-orange-50 text-orange-900'
-                    : 'border-red-500 bg-red-50 text-red-900'
+              onClick={() => setDebrisClearanceRequired(true)}
+              className={`flex-1 px-4 py-3 rounded-lg border-2 font-medium transition ${
+                debrisClearanceRequired === true
+                  ? 'border-blue-500 bg-blue-50 text-blue-900'
                   : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
               }`}
             >
-              {t(`submit.damageLevels.${level}`)}
+              {t('submit.yes')}
             </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Nature of Crisis */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {t('submit.crisisNatureLabel')} <span className="text-red-500">*</span>
-        </label>
-        <div className="space-y-4">
-          {crisisNatureOptions.map(({ category, options }) => (
-            <div key={category}>
-              <p className="text-sm font-semibold text-gray-600 mb-2">
-                {t(`submit.crisisNatureCategory.${category}`)}
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {options.map((option) => (
-                  <button
-                    key={option}
-                    type="button"
-                    onClick={() => toggleCrisisNature(option)}
-                    className={`px-3 py-2 rounded-lg border-2 text-sm font-medium transition ${
-                      crisisNature.includes(option)
-                        ? 'border-blue-500 bg-blue-50 text-blue-900'
-                        : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
-                    }`}
-                  >
-                    {t(`submit.crisisNatureOptions.${option}`)}
-                  </button>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-        {crisisNature.length > 0 && (
-          <div className="mt-3 flex flex-wrap gap-1">
-            {crisisNature.map((nature) => (
-              <span
-                key={nature}
-                className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs"
-              >
-                {t(`submit.crisisNatureOptions.${nature}`)}
-                <button
-                  type="button"
-                  onClick={() => toggleCrisisNature(nature)}
-                  className="hover:text-blue-600"
-                >
-                  <X size={12} />
-                </button>
-              </span>
-            ))}
+            <button
+              type="button"
+              onClick={() => setDebrisClearanceRequired(false)}
+              className={`flex-1 px-4 py-3 rounded-lg border-2 font-medium transition ${
+                debrisClearanceRequired === false
+                  ? 'border-blue-500 bg-blue-50 text-blue-900'
+                  : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
+              }`}
+            >
+              {t('submit.no')}
+            </button>
           </div>
-        )}
-      </div>
-
-      {/* Debris Clearance Required */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {t('submit.debrisClearanceLabel')} <span className="text-red-500">*</span>
-        </label>
-        <div className="flex gap-4">
-          <button
-            type="button"
-            onClick={() => setDebrisClearanceRequired(true)}
-            className={`flex-1 px-4 py-3 rounded-lg border-2 font-medium transition ${
-              debrisClearanceRequired === true
-                ? 'border-blue-500 bg-blue-50 text-blue-900'
-                : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
-            }`}
-          >
-            {t('submit.yes')}
-          </button>
-          <button
-            type="button"
-            onClick={() => setDebrisClearanceRequired(false)}
-            className={`flex-1 px-4 py-3 rounded-lg border-2 font-medium transition ${
-              debrisClearanceRequired === false
-                ? 'border-blue-500 bg-blue-50 text-blue-900'
-                : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
-            }`}
-          >
-            {t('submit.no')}
-          </button>
         </div>
-      </div>
 
-      {/* Description */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {t('submit.description')} <span className="text-red-500">*</span>
-        </label>
-        <textarea
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          rows={4}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder={t('submit.descriptionPlaceholder')}
-          required
-        />
-      </div>
+        {/* Description */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            {t('submit.description')} <span className="text-red-500">*</span>
+          </label>
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            rows={4}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder={t('submit.descriptionPlaceholder')}
+            required
+          />
+        </div>
 
-      {/* Contact */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {t('submit.contactLabel')}
-        </label>
-        <input
-          type="text"
-          value={submittedBy}
-          onChange={(e) => setSubmittedBy(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder={t('submit.contactPlaceholder')}
-        />
-      </div>
+        {/* Contributor alias (Your name or alias) */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            {t('submit.contactLabel')}
+          </label>
+          <input
+            type="text"
+            value={submittedBy}
+            onChange={(e) => setSubmittedBy(e.target.value)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder={t('submit.contactPlaceholder')}
+          />
+          <p className="mt-2 text-xs text-gray-500">{t('submit.aliasBadgeHelp')}</p>
+        </div>
 
-      {/* Submit Button */}
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-      >
-        {loading ? (
-          <>
-            <Loader2 size={20} className="animate-spin" />
-            <span>{t('submit.submitting')}</span>
-          </>
-        ) : (
-          <span>{t('submit.submitReport')}</span>
-        )}
-      </button>
-    </form>
+        {/* Submit Button */}
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        >
+          {loading ? (
+            <>
+              <Loader2 size={20} className="animate-spin" />
+              <span>{t('submit.submitting')}</span>
+            </>
+          ) : (
+            <span>{t('submit.submitReport')}</span>
+          )}
+        </button>
+      </form>
+
+      <CongratulationsModal
+        open={showCongratulations}
+        contributor={submittedBy.trim() || null}
+        badgeProgress={earnedBatchProgress}
+        onClose={() => {
+          setShowCongratulations(false);
+          setEarnedBatchProgress([]);
+        }}
+      />
+    </>
   );
+}
+
+function filterByContributor(subs: CrisisSubmission[], alias: string): CrisisSubmission[] {
+  const normalized = alias.trim().toLowerCase();
+  return subs.filter((s) => (s.submitted_by ?? '').trim().toLowerCase() === normalized);
 }

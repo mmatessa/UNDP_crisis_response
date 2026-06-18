@@ -8,6 +8,7 @@
   "nav": {
     "submit": "Submit Report",
     "map": "View Map",
+    "community": "Community",
     "export": "Export Data"
   },
   "submit": {
@@ -70,8 +71,9 @@
     "latitude": "Latitude",
     "longitude": "Longitude",
     "locationName": "Location name (optional)",
-    "contactLabel": "Your Contact (Optional)",
-    "contactPlaceholder": "Name or phone number",
+    "contactLabel": "Your name or alias (optional)",
+    "contactPlaceholder": "Name or alias",
+    "aliasBadgeHelp": "Provide a name or alias to earn badges and appear on the community leaderboard. Anonymous submissions are welcome and equally valued.",
     "submitReport": "Submit Report",
     "submitting": "Submitting...",
     "successMessage": "Submission successful! Thank you for your report.",
@@ -91,6 +93,7 @@
     "currentCoordinates": "Current Coordinates",
     "osmId": "OSM ID",
     "zoomNotice": "Zoom in to level 15+ to see building footprints",
+    "duplicateLocationNotice": "It looks like this location has already been reported. Your update helps keep information current!",
     "buildingError": {
       "zoom_too_low": "Zoom in to see building footprints",
       "rate_limited": "Too many requests. Please wait and try again.",
@@ -133,7 +136,13 @@
     "latestReport": "Latest Report",
     "previousReport": "Previous Report",
     "report": "report",
-    "reports": "reports"
+    "reports": "reports",
+    "verifyReport": "Verify this report",
+    "verifyReportHelp": "Confirming this report helps the contributor earn the Verified Witness badge. Anonymous confirmations are welcome.",
+    "confirmReport": "Confirm report",
+    "reportConfirmed": "Report confirmed",
+    "confirmError": "Could not confirm report. Please try again.",
+    "contributorBadges": "Badges earned by {{name}}"
   },
   "export": {
     "title": "Export Data",
@@ -149,6 +158,57 @@
     "partialDamage": "Partial Damage",
     "destroyed": "Destroyed",
     "noData": "No data to export"
+  },
+  "badges": {
+    "earned": "Earned",
+    "progress": "{{current}}/{{threshold}}",
+    "firstResponder": {
+      "name": "First Responder",
+      "description": "Submitted their first report"
+    },
+    "communityGuardian": {
+      "name": "Community Guardian",
+      "description": "Submitted reports from 5 different locations"
+    },
+    "crisisMapper": {
+      "name": "Crisis Mapper",
+      "description": "Reported 3 different crisis types"
+    },
+    "verifiedWitness": {
+      "name": "Verified Witness",
+      "description": "Had a report confirmed by another user"
+    },
+    "rapidResponder": {
+      "name": "Rapid Responder",
+      "description": "Submitted a report within 1 hour of a crisis event"
+    },
+    "modal": {
+      "title": "Report submitted!",
+      "greetingNamed": "Thank you, {{name}}, for helping your community.",
+      "greetingAnonymous": "Thank you for helping your community.",
+      "earnedHeading": "Badges you've earned",
+      "noNewBadges": "Your contribution has been recorded. Keep reporting to earn badges.",
+      "nextBadgeIntro": "You're making progress toward the next badge:",
+      "continue": "Continue reporting"
+    }
+  },
+  "community": {
+    "anonymous": "Anonymous",
+    "anonymousNote": "Anonymous submissions are welcome and equally valued. Badges are earned by alias, but contributing without one is just as impactful.",
+    "statsHeading": "Community Statistics",
+    "leaderboardHeading": "Top Contributors",
+    "noContributors": "No contributors yet. Be the first to submit a report!",
+    "reportsLabel": "reports",
+    "locationsLabel": "locations",
+    "howItWorksHeading": "How the Badge System Works",
+    "howItWorksIntro": "Earn badges by contributing community-powered crisis reports. Badges reward unique, valuable contributions — not repeat submissions at the same location.",
+    "howItWorksFooter": "Badges are tracked by alias (your name) so you can earn recognition across reports. Anonymous submissions are always welcome and equally valued.",
+    "stats": {
+      "totalReports": "Total reports",
+      "totalReporters": "Total reporters",
+      "areasCovered": "Areas covered",
+      "crisisTypes": "Crisis types reported"
+    }
   },
   "loading": "Loading submissions..."
 }
