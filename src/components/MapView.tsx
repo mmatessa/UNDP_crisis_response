@@ -46,6 +46,7 @@ export default function MapView({
   const [isLoadingBuildings, setIsLoadingBuildings] = useState(false);
   const [buildingError, setBuildingError] = useState<string | null>(null);
   const [mapReady, setMapReady] = useState(false);
+  const hasFitBounds = useRef(false);
 
   const handleBuildingSelect = useCallback(
     (building: BuildingFootprint | null) => {
@@ -149,10 +150,11 @@ setMapReady(true);
       markers.current.push(marker);
     });
 
-    if (submissions.length > 0 && map.current && !enableBuildingSelection) {
-      const group = new L.FeatureGroup(markers.current);
-      map.current.fitBounds(group.getBounds().pad(0.1), { maxZoom: 12 });
-    }
+    if (submissions.length > 0 && map.current && !enableBuildingSelection && !hasFitBounds.current) {
+  const group = new L.FeatureGroup(markers.current);
+  map.current.fitBounds(group.getBounds().pad(0.1), { maxZoom: 12 });
+  hasFitBounds.current = true;
+}
   }, [submissions, allSubmissions, onSelectSubmission, t, enableBuildingSelection, initialCenter, initialZoom]);
 
   const zoomNotice = enableBuildingSelection ? getZoomNotice(zoom) : null;
