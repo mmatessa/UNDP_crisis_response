@@ -186,7 +186,7 @@ setMapReady(true);
       )}
 
       {/* Damage Level Legend */}
-      <div className="absolute top-4 left-4 bg-white rounded-lg shadow-lg p-4 z-[400]">
+      <div className="absolute top-20 right-4 bg-white rounded-lg shadow-lg p-4 z-[400]">
         <h3 className="font-semibold text-gray-900 mb-2 text-sm">{t('map.legendTitle')}</h3>
         <div className="space-y-2 text-xs">
           <div className="flex items-center gap-2">
