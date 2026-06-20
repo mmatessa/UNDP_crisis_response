@@ -7,9 +7,37 @@ import { supabase } from '../lib/supabase';
 import type { DamageLevel, CrisisNature, InfrastructureType, CrisisSubmission } from '../types/database';
 import type { BuildingFootprint } from '../services/buildingFootprints';
 import { fetchBuildingFootprints, MIN_ZOOM } from '../services/buildingFootprints';
-import { isDuplicateLocation, computeBadgeStats, computeBadgeProgress } from '../utils/badges';
+import { isDuplicateLocation, computeBadgeStats, computeBadgeProgress, locationsAreClose } from '../utils/badges';
 import type { BadgeProgress } from '../utils/badges';
 import { CongratulationsModal } from './BadgeSystem';
+
+const DAMAGE_COLORS: Record<string, { stroke: string; fill: string }> = {
+  minimal:   { stroke: '#ca8a04', fill: '#eab308' },
+  partial:   { stroke: '#c2410c', fill: '#f97316' },
+  destroyed: { stroke: '#b91c1c', fill: '#ef4444' },
+};
+
+/**
+ * Finds the most recent submission near a given building footprint's
+ * center, if any. Mirrors the "latest report wins" logic already used
+ * for map markers in App.tsx / MapView.tsx, so a building shows its
+ * CURRENT status, not just "has been reported at some point."
+ */
+function findLatestReportForBuilding(
+  buildingCenter: [number, number],
+  allSubmissions: CrisisSubmission[]
+): CrisisSubmission | null {
+  const [lat, lng] = buildingCenter;
+
+  const matches = allSubmissions.filter((s) =>
+    locationsAreClose(lat, lng, Number(s.latitude), Number(s.longitude))
+  );
+
+  if (matches.length === 0) return null;
+
+  matches.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+  return matches[0];
+}
 
 interface SubmissionFormProps {
   onSubmitSuccess: () => void;
@@ -21,10 +49,12 @@ function BuildingSelectionMap({
   selectedBuilding,
   onSelectBuilding,
   coordinates,
+  allSubmissions,
 }: {
   selectedBuilding: BuildingFootprint | null;
   onSelectBuilding: (building: BuildingFootprint | null) => void;
   coordinates: { lat: number; lng: number } | null;
+  allSubmissions: CrisisSubmission[];
 }) {
   const { t } = useTranslation();
   const mapContainer = useRef<HTMLDivElement>(null);
@@ -136,14 +166,23 @@ function BuildingSelectionMap({
       result.buildings.forEach((building) => {
         if (selectedBuilding?.id === building.id) return;
 
+        const latestReport = findLatestReportForBuilding(building.center, allSubmissions);
+        const colors = latestReport ? DAMAGE_COLORS[latestReport.damage_level] : null;
+
         const polygon = L.polygon(building.geometry, {
-          color: '#6b7280',
-          weight: 1,
-          fillColor: '#d1d5db',
-          fillOpacity: 0.4,
+          color: colors ? colors.stroke : '#6b7280',
+          weight: colors ? 2 : 1,
+          fillColor: colors ? colors.fill : '#d1d5db',
+          fillOpacity: colors ? 0.55 : 0.4,
         });
 
-        polygon.bindTooltip(t('submit.clickToSelectBuilding'), {
+        const tooltipText = latestReport
+          ? t('submit.buildingAlreadyReported', {
+              level: t(`submit.damageLevels.${latestReport.damage_level}`),
+            })
+          : t('submit.clickToSelectBuilding');
+
+        polygon.bindTooltip(tooltipText, {
           permanent: false,
           direction: 'top',
           offset: [0, -5],
@@ -156,15 +195,15 @@ function BuildingSelectionMap({
 
         polygon.on('mouseover', function () {
           this.setStyle({
-            fillColor: '#93c5fd',
-            fillOpacity: 0.6,
+            fillColor: colors ? colors.fill : '#93c5fd',
+            fillOpacity: 0.75,
           });
         });
 
         polygon.on('mouseout', function () {
           this.setStyle({
-            fillColor: '#d1d5db',
-            fillOpacity: 0.4,
+            fillColor: colors ? colors.fill : '#d1d5db',
+            fillOpacity: colors ? 0.55 : 0.4,
           });
         });
 
@@ -173,7 +212,7 @@ function BuildingSelectionMap({
 
       loadedBuildingsRef.current = result.buildings;
     }
-  }, [zoom, isLoading, selectedBuilding, onSelectBuilding, t]);
+  }, [zoom, isLoading, selectedBuilding, onSelectBuilding, t, allSubmissions]);
 
   useEffect(() => {
     if (map.current) {
@@ -248,6 +287,21 @@ function BuildingSelectionMap({
   return (
     <div className="relative w-full h-64 rounded-lg overflow-hidden border border-gray-300 bg-gray-100">
       <div ref={mapContainer} className="w-full h-full" />
+
+      <div className="absolute bottom-2 left-2 bg-white rounded px-2 py-1.5 z-[1000] shadow text-xs space-y-1">
+        <div className="flex items-center gap-1.5">
+          <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#eab308' }} />
+          <span>{t('submit.damageLevels.minimal')}</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#f97316' }} />
+          <span>{t('submit.damageLevels.partial')}</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#ef4444' }} />
+          <span>{t('submit.damageLevels.destroyed')}</span>
+        </div>
+      </div>
 
       {zoomNotice && (
         <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 bg-yellow-100 border border-yellow-300 rounded px-3 py-1 z-[1000] shadow">
@@ -577,6 +631,7 @@ export default function SubmissionForm({
             selectedBuilding={selectedBuilding}
             onSelectBuilding={handleBuildingSelect}
             coordinates={coordinates}
+            allSubmissions={allSubmissions}
           />
 
           {/* Duplicate location notice */}

@@ -84,6 +84,7 @@
     "buildingLocationLabel": "Seleccionar Edificio/Ubicación",
     "buildingLocationHelp": "Haz clic en un contorno de edificio o en cualquier lugar del mapa para seleccionar una ubicación. Amplía al nivel 15+ para ver los contornos de edificios.",
     "clickToSelectBuilding": "Haz clic para seleccionar este edificio",
+    "buildingAlreadyReported": "Ya reportado: daño {{level}}. Haga clic para actualizar.",
     "selectedBuilding": "Edificio Seleccionado",
     "selectedBuildingLabel": "Edificio Seleccionado",
     "customLocation": "Ubicación personalizada",

@@ -84,6 +84,7 @@
     "buildingLocationLabel": "اختر المبنى / الموقع",
     "buildingLocationHelp": "انقر على بصمة المبنى أو في أي مكان على الخريطة لاختيار الموقع. قم بالتكبير إلى مستوى 15+ لرؤية بصمات المباني.",
     "clickToSelectBuilding": "انقر لاختيار هذا المبنى",
+    "buildingAlreadyReported": "تم الإبلاغ عنه مسبقًا: أضرار {{level}}. انقر للتحديث.",
     "selectedBuilding": "المبنى المختار",
     "selectedBuildingLabel": "المبنى المختار",
     "customLocation": "موقع مخصص",

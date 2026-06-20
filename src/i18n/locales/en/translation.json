@@ -84,6 +84,7 @@
     "buildingLocationLabel": "Select Building / Location",
     "buildingLocationHelp": "Click on a building footprint or click anywhere on the map to select a location. Zoom in to level 15+ to see building footprints.",
     "clickToSelectBuilding": "Click to select this building",
+    "buildingAlreadyReported": "Already reported: {{level}} damage. Click to update.",
     "selectedBuilding": "Selected Building",
     "selectedBuildingLabel": "Selected Building",
     "customLocation": "Custom location",

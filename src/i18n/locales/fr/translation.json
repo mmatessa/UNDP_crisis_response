@@ -84,6 +84,7 @@
     "buildingLocationLabel": "Sélectionner le Bâtiment/Localisation",
     "buildingLocationHelp": "Cliquez sur un bâtiment ou n'importe où sur la carte pour sélectionner un emplacement. Zoomez au niveau 15+ pour voir les empreintes des bâtiments.",
     "clickToSelectBuilding": "Cliquez pour sélectionner ce bâtiment",
+    "buildingAlreadyReported": "Déjà signalé : dommage {{level}}. Cliquez pour mettre à jour.",
     "selectedBuilding": "Bâtiment Sélectionné",
     "selectedBuildingLabel": "Bâtiment Sélectionné",
     "customLocation": "Localisation personnalisée",

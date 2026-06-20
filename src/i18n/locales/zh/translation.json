@@ -84,6 +84,7 @@
     "buildingLocationLabel": "选择建筑/位置",
     "buildingLocationHelp": "点击建筑轮廓或地图上的任意位置来选择位置。放大到15级以上可查看建筑轮廓。",
     "clickToSelectBuilding": "点击选择此建筑",
+    "buildingAlreadyReported": "已报告：{{level}}损坏。点击更新。",
     "selectedBuilding": "已选建筑",
     "selectedBuildingLabel": "已选择建筑",
     "customLocation": "自定义位置",
