@@ -11,6 +11,21 @@
     "community": "Comunidad",
     "export": "Exportar Datos"
   },
+  "offline": {
+    "statusOnline": "En línea",
+    "statusOffline": "Sin conexión",
+    "statusSyncing": "Sincronizando...",
+    "statusFailed": "Fallido",
+    "statusItemPending": "Esperando para sincronizar",
+    "statusItemSyncing": "Sincronizando ahora...",
+    "queueTitle": "Informes sin conexión",
+    "offlineExplainer": "Estás sin conexión. Los informes se guardan en este dispositivo y se subirán automáticamente cuando te vuelvas a conectar.",
+    "onlineExplainer": "Estos informes están guardados localmente y sincronizándose con el servidor.",
+    "noQueuedItems": "No hay informes en cola.",
+    "unnamedLocation": "Ubicación sin nombre",
+    "retry": "Reintentar",
+    "syncNow": "Sincronizar ahora"
+  },
   "submit": {
     "title": "Enviar Informe de Crisis",
     "helpTitle": "Ayúdanos a responder más rápido",
@@ -100,7 +115,8 @@
       "rate_limited": "Demasiadas solicitudes. Espera e intenta de nuevo.",
       "network_error": "No se pueden cargar los edificios. Verifica tu conexión.",
       "timeout": "Tiempo de espera agotado. Intenta de nuevo."
-    }
+    },
+    "savedOfflineWillSync": "Sin conexión: tu informe se ha guardado en este dispositivo y se subirá automáticamente cuando vuelvas a estar en línea."
   },
   "map": {
     "legendTitle": "Leyenda de Daños",

@@ -14,6 +14,8 @@ import SubmissionDetail from './components/SubmissionDetail';
 import ExportPanel from './components/ExportPanel';
 import LanguageSelector from './components/LanguageSelector';
 import CommunityView from './components/CommunityView';
+import { startOfflineSync } from './services/offlineSync';
+import OfflineQueueStatus from './components/OfflineQueueStatus';
 
 type Tab = 'submit' | 'map' | 'community' | 'export';
 
@@ -109,6 +111,8 @@ function App() {
     loadSubmissions();
     loadConfirmations();
 
+    const stopOfflineSync = startOfflineSync();
+
     const channel = supabase
       .channel('crisis_submissions_changes')
       .on(
@@ -142,6 +146,7 @@ function App() {
     return () => {
       supabase.removeChannel(channel);
       supabase.removeChannel(confirmationChannel);
+      stopOfflineSync();
     };
   }, []);
 
@@ -170,7 +175,10 @@ function App() {
                 </p>
               </div>
             </div>
-            <LanguageSelector />
+            <div className="flex items-center gap-3">
+              <OfflineQueueStatus />
+              <LanguageSelector />
+            </div>
           </div>
         </div>
       </header>

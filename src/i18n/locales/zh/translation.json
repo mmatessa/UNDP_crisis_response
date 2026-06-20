@@ -11,6 +11,21 @@
     "community": "社区",
     "export": "导出数据"
   },
+  "offline": {
+    "statusOnline": "在线",
+    "statusOffline": "离线",
+    "statusSyncing": "同步中...",
+    "statusFailed": "失败",
+    "statusItemPending": "等待同步",
+    "statusItemSyncing": "正在同步...",
+    "queueTitle": "离线报告",
+    "offlineExplainer": "您当前离线。报告将保存在此设备上，重新连接后将自动上传。",
+    "onlineExplainer": "这些报告已保存在本地并正在与服务器同步。",
+    "noQueuedItems": "没有排队的报告。",
+    "unnamedLocation": "未命名地点",
+    "retry": "重试",
+    "syncNow": "立即同步"
+  },
   "submit": {
     "title": "提交危机报告",
     "helpTitle": "帮助我们更快响应",
@@ -100,7 +115,8 @@
       "rate_limited": "请求过多，请稍后再试。",
       "network_error": "无法加载建筑，请检查网络连接。",
       "timeout": "请求超时，请重试。"
-    }
+    },
+    "savedOfflineWillSync": "无网络连接 — 您的报告已保存在此设备上，重新联网后将自动上传。"
   },
   "map": {
     "legendTitle": "损害图例",

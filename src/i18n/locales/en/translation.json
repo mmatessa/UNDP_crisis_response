@@ -11,6 +11,21 @@
     "community": "Community",
     "export": "Export Data"
   },
+  "offline": {
+    "statusOnline": "Online",
+    "statusOffline": "Offline",
+    "statusSyncing": "Syncing...",
+    "statusFailed": "Failed",
+    "statusItemPending": "Waiting to sync",
+    "statusItemSyncing": "Syncing now...",
+    "queueTitle": "Offline Reports",
+    "offlineExplainer": "You're offline. Reports are saved on this device and will upload automatically once you reconnect.",
+    "onlineExplainer": "These reports are saved locally and syncing to the server.",
+    "noQueuedItems": "No reports queued.",
+    "unnamedLocation": "Unnamed location",
+    "retry": "Retry",
+    "syncNow": "Sync now"
+  },
   "submit": {
     "title": "Submit Crisis Report",
     "helpTitle": "Help us respond faster",
@@ -100,7 +115,8 @@
       "rate_limited": "Too many requests. Please wait and try again.",
       "network_error": "Unable to load buildings. Check your connection.",
       "timeout": "Request timed out. Please try again."
-    }
+    },
+    "savedOfflineWillSync": "No connection — your report has been saved on this device and will upload automatically once you're back online."
   },
   "map": {
     "legendTitle": "Damage Legend",

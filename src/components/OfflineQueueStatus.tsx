@@ -13,7 +13,7 @@
 
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { WifiOff, Wifi, CloudUpload, RefreshCw, AlertCircle } from 'lucide-react';
+import { WifiOff, Wifi, UploadCloud, RefreshCw, AlertCircle } from 'lucide-react';
 import {
   getQueuedSubmissions,
   type QueuedSubmission,
@@ -107,7 +107,7 @@ export default function OfflineQueueStatus() {
         <div className="absolute right-0 top-full mt-2 bg-white rounded-lg shadow-xl border border-gray-200 w-80 max-h-96 overflow-y-auto z-[2000]">
           <div className="p-3 border-b border-gray-100">
             <div className="flex items-center gap-2 text-sm text-gray-700">
-              <CloudUpload size={16} />
+              <UploadCloud size={16} />
               <span className="font-semibold">{t('offline.queueTitle')}</span>
             </div>
             <p className="text-xs text-gray-500 mt-1">

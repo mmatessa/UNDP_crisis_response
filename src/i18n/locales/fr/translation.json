@@ -11,6 +11,21 @@
     "community": "Communauté",
     "export": "Exporter les Données"
   },
+  "offline": {
+    "statusOnline": "En ligne",
+    "statusOffline": "Hors ligne",
+    "statusSyncing": "Synchronisation...",
+    "statusFailed": "Échec",
+    "statusItemPending": "En attente de synchronisation",
+    "statusItemSyncing": "Synchronisation en cours...",
+    "queueTitle": "Rapports hors ligne",
+    "offlineExplainer": "Vous êtes hors ligne. Les rapports sont enregistrés sur cet appareil et seront téléchargés automatiquement dès que vous vous reconnecterez.",
+    "onlineExplainer": "Ces rapports sont enregistrés localement et en cours de synchronisation avec le serveur.",
+    "noQueuedItems": "Aucun rapport en file d'attente.",
+    "unnamedLocation": "Lieu sans nom",
+    "retry": "Réessayer",
+    "syncNow": "Synchroniser maintenant"
+  },
   "submit": {
     "title": "Soumettre un Rapport de Crise",
     "helpTitle": "Aidez-nous à répondre plus rapidement",
@@ -100,7 +115,8 @@
       "rate_limited": "Trop de requêtes. Veuillez patienter et réessayer.",
       "network_error": "Impossible de charger les bâtiments. Vérifiez votre connexion.",
       "timeout": "Délai d'attente dépassé. Veuillez réessayer."
-    }
+    },
+    "savedOfflineWillSync": "Pas de connexion — votre rapport a été enregistré sur cet appareil et sera téléchargé automatiquement une fois en ligne."
   },
   "map": {
     "legendTitle": "Légende des Dommages",

@@ -7,6 +7,7 @@ import { supabase } from '../lib/supabase';
 import type { DamageLevel, CrisisNature, InfrastructureType, CrisisSubmission } from '../types/database';
 import type { BuildingFootprint } from '../services/buildingFootprints';
 import { fetchBuildingFootprints, MIN_ZOOM } from '../services/buildingFootprints';
+import { queueSubmission } from '../services/offlineQueue';
 import { isDuplicateLocation, computeBadgeStats, computeBadgeProgress, locationsAreClose } from '../utils/badges';
 import type { BadgeProgress } from '../utils/badges';
 import { CongratulationsModal } from './BadgeSystem';
@@ -519,26 +520,47 @@ export default function SubmissionForm({
 
     setLoading(true);
 
+    const alias = submittedBy.trim();
+    const isCurrentlyOffline = typeof navigator !== 'undefined' && navigator.onLine === false;
+
     try {
-      const photoUrl = await uploadPhoto(photoFile);
+      if (isCurrentlyOffline) {
+        await queueSubmission({
+          photoBlob: photoFile,
+          photoFileName: `${Math.random().toString(36).substring(2)}-${Date.now()}.${photoFile.name.split('.').pop()}`,
+          description,
+          damage_level: damageLevel,
+          infrastructure_type:
+            infrastructureType === 'other' ? `other: ${otherInfrastructureType}` : infrastructureType,
+          infrastructure_name: infrastructureName || null,
+          crisis_nature: crisisNature,
+          debris_clearance_required: debrisClearanceRequired,
+          latitude: coordinates.lat,
+          longitude: coordinates.lng,
+          location_name: locationName || null,
+          submitted_by: alias || null,
+        });
+        alert(t('submit.savedOfflineWillSync'));
+      } else {
+        const photoUrl = await uploadPhoto(photoFile);
 
-      const alias = submittedBy.trim();
-      const { error } = await supabase.from('crisis_submissions').insert({
-        photo_url: photoUrl,
-        description,
-        damage_level: damageLevel,
-        infrastructure_type:
-          infrastructureType === 'other' ? `other: ${otherInfrastructureType}` : infrastructureType,
-        infrastructure_name: infrastructureName || null,
-        crisis_nature: crisisNature,
-        debris_clearance_required: debrisClearanceRequired,
-        latitude: coordinates.lat,
-        longitude: coordinates.lng,
-        location_name: locationName || null,
-        submitted_by: alias || null,
-      });
+        const { error } = await supabase.from('crisis_submissions').insert({
+          photo_url: photoUrl,
+          description,
+          damage_level: damageLevel,
+          infrastructure_type:
+            infrastructureType === 'other' ? `other: ${otherInfrastructureType}` : infrastructureType,
+          infrastructure_name: infrastructureName || null,
+          crisis_nature: crisisNature,
+          debris_clearance_required: debrisClearanceRequired,
+          latitude: coordinates.lat,
+          longitude: coordinates.lng,
+          location_name: locationName || null,
+          submitted_by: alias || null,
+        });
 
-      if (error) throw error;
+        if (error) throw error;
+      }
 
       // Build updated submission list (including the just-submitted one) so the
       // congratulations modal can compute current badge progress accurately.
@@ -586,8 +608,31 @@ export default function SubmissionForm({
 
       onSubmitSuccess();
     } catch (error) {
-      console.error('Error submitting:', error);
-      alert(t('submit.submitError'));
+      console.error('Error submitting, falling back to offline queue:', error);
+
+      try {
+        await queueSubmission({
+          photoBlob: photoFile,
+          photoFileName: `${Math.random().toString(36).substring(2)}-${Date.now()}.${photoFile.name.split('.').pop()}`,
+          description,
+          damage_level: damageLevel,
+          infrastructure_type:
+            infrastructureType === 'other' ? `other: ${otherInfrastructureType}` : infrastructureType,
+          infrastructure_name: infrastructureName || null,
+          crisis_nature: crisisNature,
+          debris_clearance_required: debrisClearanceRequired,
+          latitude: coordinates.lat,
+          longitude: coordinates.lng,
+          location_name: locationName || null,
+          submitted_by: alias || null,
+        });
+        alert(t('submit.savedOfflineWillSync'));
+      } catch (queueError) {
+        console.error('Failed to queue submission offline:', queueError);
+        alert(t('submit.submitError'));
+        setLoading(false);
+        return;
+      }
     } finally {
       setLoading(false);
     }
