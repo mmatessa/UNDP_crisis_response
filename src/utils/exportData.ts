@@ -1,5 +1,17 @@
 import type { CrisisSubmission } from '../types/database';
 
+/**
+ * Returns a privacy-safe representation of the optional contact field
+ * for use in PUBLIC exports. The raw value may contain a name, phone
+ * number, or other personal contact info the submitter chose to share
+ * for in-app coordination purposes — it is not intended for
+ * redistribution in exported datasets. We surface only whether an
+ * attribution was provided, not its contents.
+ */
+function redactContactInfo(submittedBy: string | null): string {
+  return submittedBy ? 'Provided (redacted)' : 'Anonymous';
+}
+
 export const exportToCSV = (submissions: CrisisSubmission[]) => {
   const headers = [
     'ID',
@@ -29,7 +41,7 @@ export const exportToCSV = (submissions: CrisisSubmission[]) => {
     s.latitude,
     s.longitude,
     s.location_name || '',
-    s.submitted_by || '',
+    redactContactInfo(s.submitted_by),
     s.photo_url,
   ]);
 
@@ -67,7 +79,7 @@ export const exportToJSON = (submissions: CrisisSubmission[]) => {
       },
       description: s.description,
       photo_url: s.photo_url,
-      submitted_by: s.submitted_by,
+      submitted_by: redactContactInfo(s.submitted_by),
     })),
   };
 
@@ -102,7 +114,7 @@ export const exportToGeoJSON = (submissions: CrisisSubmission[]) => {
         debris_clearance_required: s.debris_clearance_required,
         description: s.description,
         location_name: s.location_name,
-        submitted_by: s.submitted_by,
+        submitted_by: redactContactInfo(s.submitted_by),
         photo_url: s.photo_url,
       },
     })),
@@ -156,7 +168,7 @@ export const exportToRAPIDA = (submissions: CrisisSubmission[]) => {
       photo_url: s.photo_url,
       source: 'community_report',
       confidence: 'unverified',
-      submitted_by: s.submitted_by || 'anonymous',
+      submitted_by: redactContactInfo(s.submitted_by),
     })),
   };
 
