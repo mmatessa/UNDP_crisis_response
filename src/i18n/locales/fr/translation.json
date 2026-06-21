@@ -1,7 +1,7 @@
 {
   "app": {
     "title": "Plateforme de Réponse aux Crises du PNUD",
-    "subtitle": "Évaluation des dégâts et réponse rapide portées par la communauté",
+    "subtitle": "Partagez des photos des dégâts pour aider à prioriser l'aide",
     "poweredBy": "Propulsé par le Programme des Nations Unies pour le Développement (PNUD)",
     "openSource": "Plateforme open-source de réponse aux crises portée par la communauté"
   },
@@ -28,8 +28,6 @@
   },
   "submit": {
     "title": "Soumettre un Rapport de Crise",
-    "helpTitle": "Aidez-nous à répondre plus rapidement",
-    "helpText": "Partagez des photos et des informations sur les infrastructures endommagées pour aider les intervenants d'urgence à prioriser l'aide et les efforts de rétablissement.",
     "photoLabel": "Photo des Dégâts",
     "photoRequired": "Veuillez télécharger une photo",
     "uploadPhoto": "Télécharger Photo",

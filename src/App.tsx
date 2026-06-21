@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { AlertCircle, Map as MapIcon, Upload, Download, Shield, Users } from 'lucide-react';
+import { Map as MapIcon, Upload, Download, Shield, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import './i18n';
 import type { ReportConfirmation } from './types/database';
@@ -216,15 +216,6 @@ function App() {
           <>
             {activeTab === 'submit' && (
               <div className="max-w-2xl mx-auto">
-                <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4 flex gap-3">
-                  <AlertCircle className="text-blue-600 flex-shrink-0 mt-1" size={20} />
-                  <div className="text-sm text-blue-900">
-                    <p className="font-semibold mb-1">{t('submit.helpTitle')}</p>
-                    <p>
-                      {t('submit.helpText')}
-                    </p>
-                  </div>
-                </div>
                 <SubmissionForm
                   onSubmitSuccess={loadSubmissions}
                   allSubmissions={submissions}

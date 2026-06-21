@@ -1,7 +1,7 @@
 {
   "app": {
     "title": "UNDP Crisis Response Platform",
-    "subtitle": "Community-powered damage assessment and rapid response",
+    "subtitle": "Share photos of damage to help responders prioritize aid",
     "poweredBy": "Powered by the United Nations Development Programme (UNDP)",
     "openSource": "Open-source platform for community-powered crisis response"
   },
@@ -28,8 +28,6 @@
   },
   "submit": {
     "title": "Submit Crisis Report",
-    "helpTitle": "Help us respond faster",
-    "helpText": "Share photos and information about damaged infrastructure to help emergency responders prioritize aid and recovery efforts.",
     "photoLabel": "Photo of Damage",
     "photoRequired": "Please upload a photo",
     "uploadPhoto": "Upload Photo",

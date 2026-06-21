@@ -1,7 +1,7 @@
 {
   "app": {
     "title": "联合国开发计划署危机响应平台",
-    "subtitle": "社区支持的损害评估与快速响应",
+    "subtitle": "分享受损照片，帮助救援人员优先安排援助",
     "poweredBy": "由联合国开发计划署提供支持",
     "openSource": "社区支持的危机响应开源平台"
   },
@@ -28,8 +28,6 @@
   },
   "submit": {
     "title": "提交危机报告",
-    "helpTitle": "帮助我们更快响应",
-    "helpText": "分享受损基础设施的照片和信息，帮助紧急响应人员优先安排援助和恢复工作。",
     "photoLabel": "损害照片",
     "photoRequired": "请上传照片",
     "uploadPhoto": "上传照片",
