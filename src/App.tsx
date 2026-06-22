@@ -227,13 +227,14 @@ function App() {
 
             {activeTab === 'map' && (
               <div className="h-[calc(100vh-280px)] min-h-[600px]">
-                <MapView
-                  submissions={latestSubmissions}
-                  allSubmissions={submissions}
-                  onSelectSubmission={setSelectedSubmission}
-                  initialCenter={DEFAULT_MAP_CENTER}
-                  initialZoom={DEFAULT_MAP_ZOOM}
-                />
+<MapView
+  submissions={latestSubmissions}
+  allSubmissions={submissions}
+  onSelectSubmission={setSelectedSubmission}
+  initialCenter={DEFAULT_MAP_CENTER}
+  initialZoom={DEFAULT_MAP_ZOOM}
+  respectInitialView={true}
+/>
               </div>
             )}
 
