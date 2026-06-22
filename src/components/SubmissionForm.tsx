@@ -8,6 +8,7 @@ import type { DamageLevel, CrisisNature, InfrastructureType, CrisisSubmission } 
 import type { BuildingFootprint } from '../services/buildingFootprints';
 import { fetchBuildingFootprints, MIN_ZOOM } from '../services/buildingFootprints';
 import { queueSubmission } from '../services/offlineQueue';
+import { DEFAULT_MAP_CENTER, DEFAULT_MAP_ZOOM } from '../constants/mapDefaults';
 import { isDuplicateLocation, computeBadgeStats, computeBadgeProgress, locationsAreClose } from '../utils/badges';
 import type { BadgeProgress } from '../utils/badges';
 import { CongratulationsModal } from './BadgeSystem';
@@ -63,7 +64,7 @@ function BuildingSelectionMap({
   const buildingsLayerRef = useRef<L.LayerGroup | null>(null);
   const selectedPolygonRef = useRef<L.Polygon | null>(null);
   const currentMarkerRef = useRef<L.Marker | null>(null);
-  const [zoom, setZoom] = useState(15);
+  const [zoom, setZoom] = useState(DEFAULT_MAP_ZOOM);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const loadedBuildingsRef = useRef<BuildingFootprint[]>([]);
@@ -71,14 +72,14 @@ function BuildingSelectionMap({
 
   const initialCenter: [number, number] = coordinates
     ? [coordinates.lat, coordinates.lng]
-    : [20, 0];
+    : DEFAULT_MAP_CENTER;
 
   useEffect(() => {
     if (!mapContainer.current || map.current) return;
 
     map.current = L.map(mapContainer.current, {
       center: initialCenter,
-      zoom: coordinates ? 17 : 15,
+      zoom: coordinates ? 17 : DEFAULT_MAP_ZOOM,
       scrollWheelZoom: true,
     });
 

@@ -10,6 +10,7 @@ import type { CrisisSubmission } from './types/database';
 import { getVerifiedSubmissionIds } from './utils/badges';
 import SubmissionForm from './components/SubmissionForm';
 import MapView from './components/MapView';
+import { DEFAULT_MAP_CENTER, DEFAULT_MAP_ZOOM } from './constants/mapDefaults';
 import SubmissionDetail from './components/SubmissionDetail';
 import ExportPanel from './components/ExportPanel';
 import LanguageSelector from './components/LanguageSelector';
@@ -230,6 +231,8 @@ function App() {
                   submissions={latestSubmissions}
                   allSubmissions={submissions}
                   onSelectSubmission={setSelectedSubmission}
+                  initialCenter={DEFAULT_MAP_CENTER}
+                  initialZoom={DEFAULT_MAP_ZOOM}
                 />
               </div>
             )}
