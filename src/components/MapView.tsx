@@ -16,6 +16,7 @@ interface MapViewProps {
   enableBuildingSelection?: boolean;
   initialCenter?: [number, number];
   initialZoom?: number;
+  respectInitialView?: boolean;
 }
 
 const PROXIMITY_THRESHOLD = 0.0001;
@@ -37,6 +38,7 @@ export default function MapView({
   enableBuildingSelection = false,
   initialCenter = [20, 0],
   initialZoom = 2,
+  respectInitialView = false,
 }: MapViewProps) {
   const { t } = useTranslation();
   const mapContainer = useRef<HTMLDivElement>(null);
@@ -150,12 +152,12 @@ setMapReady(true);
       markers.current.push(marker);
     });
 
-    if (submissions.length > 0 && map.current && !enableBuildingSelection && !hasFitBounds.current) {
+if (submissions.length > 0 && map.current && !enableBuildingSelection && !respectInitialView && !hasFitBounds.current) {
   const group = new L.FeatureGroup(markers.current);
   map.current.fitBounds(group.getBounds().pad(0.1), { maxZoom: 12 });
   hasFitBounds.current = true;
 }
-  }, [submissions, allSubmissions, onSelectSubmission, t, enableBuildingSelection, initialCenter, initialZoom]);
+}, [submissions, allSubmissions, onSelectSubmission, t, enableBuildingSelection, initialCenter, initialZoom, respectInitialView]);
 
   const zoomNotice = enableBuildingSelection ? getZoomNotice(zoom) : null;
 
