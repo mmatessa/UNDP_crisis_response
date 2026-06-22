@@ -519,10 +519,11 @@ export default function SubmissionForm({
       return;
     }
 
-    setLoading(true);
+setLoading(true);
 
     const alias = submittedBy.trim();
     const isCurrentlyOffline = typeof navigator !== 'undefined' && navigator.onLine === false;
+    let photoUrl = '';
 
     try {
       if (isCurrentlyOffline) {
@@ -541,9 +542,10 @@ export default function SubmissionForm({
           location_name: locationName || null,
           submitted_by: alias || null,
         });
-        alert(t('submit.savedOfflineWillSync'));
+alert(t('submit.savedOfflineWillSync'));
+        photoUrl = photoPreview;
       } else {
-        const photoUrl = await uploadPhoto(photoFile);
+        photoUrl = await uploadPhoto(photoFile);
 
         const { error } = await supabase.from('crisis_submissions').insert({
           photo_url: photoUrl,
